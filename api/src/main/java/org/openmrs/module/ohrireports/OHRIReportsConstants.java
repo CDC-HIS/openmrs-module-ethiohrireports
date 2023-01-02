@@ -223,9 +223,9 @@ public class OHRIReportsConstants {
 	
 	public final static String ART_START_DATE = "159599AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 	
-	public final static String TRANSFERE_IN = "160563AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+	public final static String TRANSFERRED_IN = "160563AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 	
-	public final static String REASON_FOR_ART_ELIGABLITY = "162225AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+	public final static String REASON_FOR_ART_ELIGIBILITY = "162225AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 	
 	public final static String FOLLOW_UP_DATE = "163137AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 	
@@ -248,8 +248,19 @@ public class OHRIReportsConstants {
 	
 	public final static String PATIENT_STATUS = "160433AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 	
+	public final static String TRANSFERRED_UUID = "1693AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+	
 	public final static String ALIVE = "160429AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 	
 	public final static String RESTART = "ee957295-85b9-4433-bf12-45886cdc7dd1";
+	
+	//#region
+	public final static String UNIQUE_ANTIRETROVAIRAL_THERAPY_UAN = "164402AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+	
+	public final static String SERVICE_DELIVERY_POINT_NUMBER_MRN = "162054AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+	
+	//TODO: update as soon as the concept created 
+	public final static String ADHERENCE_UUID = "";
+	//#endregion
 	
 }
