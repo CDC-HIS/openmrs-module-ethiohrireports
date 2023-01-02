@@ -1,6 +1,9 @@
 package org.openmrs.module.ohrireports.reports.datasetevaluator;
 
+import java.io.ObjectInput;
+import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -35,6 +38,8 @@ import org.openmrs.module.reporting.evaluation.EvaluationException;
 import org.openmrs.module.reporting.evaluation.querybuilder.HqlQueryBuilder;
 import org.openmrs.module.reporting.evaluation.service.EvaluationService;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import net.sf.cglib.core.Local;
 
 /*
  * 
@@ -118,6 +123,10 @@ public class TransferredInOutDataSetDefinitionEvaluator implements DataSetEvalua
 		tDataSetDefinition = (TransferredInOutDataSetDefinition) dataSetDefinition;
 		this.evalContext = evalContext;
 		SimpleDataSet dataSet = new SimpleDataSet(tDataSetDefinition, this.evalContext);
+		
+		if (tDataSetDefinition.getEndDate() == null)
+			tDataSetDefinition.setEndDate(Calendar.getInstance().getTime());
+		
 		List<Patient> patients = getTransferredPatients();
 		transferredConcept = conceptService.getConceptByUuid(TRANSFERRED_UUID);
 		for (Patient patient : patients) {
@@ -157,41 +166,65 @@ public class TransferredInOutDataSetDefinitionEvaluator implements DataSetEvalua
 	* Get patients on Art 
 	*/
 	private List<Patient> getTransferredPatients() {
+		
 		return evaluationService.evaluateToList(
-		    new HqlQueryBuilder().select("obs.encounter.patient").from(Obs.class, "obs")
+		    new HqlQueryBuilder()
+		            .select("obs.encounter.patient")
+		            .from(Obs.class, "obs")
 		            .whereEqual("obs.concept", conceptService.getConceptByUuid(ART_START_DATE))
-		            .whereBetweenInclusive("obs.valueDatetime", tDataSetDefinition.getStartDate(),tDataSetDefinition.getEndDate()), Patient.class, evalContext);
+		            .whereBetweenInclusive("obs.valueDatetime", tDataSetDefinition.getStartDate(),
+		                tDataSetDefinition.getEndDate()), Patient.class, evalContext);
 		
 	}
 	
 	private String getPatientMRN(Person person) {
-		return evaluationService.evaluateToObject(new HqlQueryBuilder().select("obs.valueText").from(Obs.class, "obs")
-		        .whereEqual("obs.concept", conceptService.getConceptByUuid(SERVICE_DELIVERY_POINT_NUMBER_MRN)).and()
-		        .whereEqual("obs.person", person).whereLessOrEqualTo("obs.obsDatetime", tDataSetDefinition.getEndDate())
-		        .limit(1).orderDesc("obs.obsDatetime"), String.class, evalContext);
+		return evaluationService.evaluateToObject(
+		    new HqlQueryBuilder()
+		            .select("obs.valueText")
+		            .from(Obs.class, "obs")
+		            .whereEqual("obs.concept", conceptService.getConceptByUuid(SERVICE_DELIVERY_POINT_NUMBER_MRN))
+		            .and()
+		            .whereEqual("obs.person", person)
+		            .whereBetweenInclusive("obs.obsDatetime", tDataSetDefinition.getStartDate(),
+		                tDataSetDefinition.getEndDate()).limit(1).orderDesc("obs.obsDatetime"), String.class, evalContext);
 	}
 	
 	private Object GetLastFollowUp(Person person) {
-		EncounterType encounterType = evaluationService.evaluateToObject(
-		    new HqlQueryBuilder().select("encounter.encounterType").from(Encounter.class, "encounter")
+		EncounterType encounterType = new EncounterType();
+		encounterType = evaluationService.evaluateToObject(
+		    new HqlQueryBuilder()
+		            .select("encounter.encounterType")
+		            .from(Encounter.class, "encounter")
 		            .whereEqual("encounter.patient", person)
-		            .whereBetweenInclusive("encounter.encounterDatetime",tDataSetDefinition.getStartDate(),
-					 tDataSetDefinition.getEndDate()).limit(1),
-		    EncounterType.class, evalContext);
+		            .whereBetweenInclusive("encounter.encounterDatetime", tDataSetDefinition.getStartDate(),
+		                tDataSetDefinition.getEndDate()).limit(1), EncounterType.class, evalContext);
+		
 		return encounterType.equals(null) ? "" : encounterType.getName();
 	}
 	
 	private String getPatientUAN(Person patient) {
-		return evaluationService.evaluateToObject(new HqlQueryBuilder().select("obs.valueText").from(Obs.class, "obs")
-		        .whereEqual("obs.concept", conceptService.getConceptByUuid(UNIQUE_ANTIRETROVAIRAL_THERAPY_UAN)).and()
-		        .whereEqual("obs.person", patient).whereLessOrEqualTo("obs.obsDatetime", tDataSetDefinition.getEndDate())
-		        .limit(1).orderDesc("obs.obsDatetime"), String.class, evalContext);
+		
+		return evaluationService.evaluateToObject(
+		    new HqlQueryBuilder()
+		            .select("obs.valueText")
+		            .from(Obs.class, "obs")
+		            .whereEqual("obs.concept", conceptService.getConceptByUuid(UNIQUE_ANTIRETROVAIRAL_THERAPY_UAN))
+		            .and()
+		            .whereEqual("obs.person", patient)
+		            .whereBetweenInclusive("obs.obsDatetime", tDataSetDefinition.getStartDate(),
+		                tDataSetDefinition.getEndDate()).limit(1).orderDesc("obs.obsDatetime"), String.class, evalContext);
+		
 	}
 	
 	private String getAdherence(Person patient) {
-		return evaluationService.evaluateToObject(
-		    new HqlQueryBuilder().select("obs.").from(Obs.class, "obs")
-		            .whereEqual("obs.concept", conceptService.getConceptByUuid(ADHERENCE_UUID)), null, evalContext);
+		Concept adConcept = evaluationService.evaluateToObject(
+		    new HqlQueryBuilder()
+		            .select("obs.valueCoded")
+		            .from(Obs.class, "obs")
+		            .whereEqual("obs.concept", conceptService.getConceptByUuid(ADHERENCE_UUID))
+		            .whereBetweenInclusive("obs.obsDatetime", tDataSetDefinition.getStartDate(),
+		                tDataSetDefinition.getEndDate()).limit(1), Concept.class, evalContext);
+		return adConcept.equals(null) ? "" : adConcept.getName().getName();
 	}
 	
 	private String getLastArtRegiment(Person person) {
@@ -206,6 +239,13 @@ public class TransferredInOutDataSetDefinitionEvaluator implements DataSetEvalua
 	}
 	
 	private Obs getArtStartDate(Patient patient) {
+		if (tDataSetDefinition.getStartDate().equals(null))
+			return evaluationService.evaluateToObject(
+			    new HqlQueryBuilder().select("obs").from(Obs.class, "obs.valueDatetime")
+			            .whereEqual("obs.concept", conceptService.getConceptByUuid(ART_START_DATE))
+			            .whereLessOrEqualTo("obs.obsDatetime", tDataSetDefinition.getEndDate()).orderDesc("obs.obsDatetime")
+			            .limit(1), Obs.class, evalContext);
+		
 		return evaluationService.evaluateToObject(
 		    new HqlQueryBuilder()
 		            .select("obs")
@@ -216,6 +256,7 @@ public class TransferredInOutDataSetDefinitionEvaluator implements DataSetEvalua
 	}
 	
 	private Obs getPatientFollowUpStatus(Patient patient) {
+		
 		return evaluationService.evaluateToObject(
 		    new HqlQueryBuilder()
 		            .select("obs")
@@ -224,10 +265,8 @@ public class TransferredInOutDataSetDefinitionEvaluator implements DataSetEvalua
 		                encounterService.getEncounterTypeByUuid(HTS_FOLLOW_UP_ENCOUNTER_TYPE))
 		            .whereIn(
 		                "obs.valueCoded",
-		                Arrays.asList(conceptService.getConceptByUuid(ALIVE),
-							conceptService.getConceptByUuid(RESTART),
-		                    conceptService.getConceptByUuid(ALIVE),
-							transferredConcept,
+		                Arrays.asList(conceptService.getConceptByUuid(ALIVE), conceptService.getConceptByUuid(RESTART),
+		                    conceptService.getConceptByUuid(ALIVE), transferredConcept,
 		                    conceptService.getConceptByUuid(TRANSFERRED_IN)))
 		            .and()
 		            .whereEqual("obs.person", patient.getPerson())

@@ -9,6 +9,7 @@
  */
 package org.openmrs.module.ohrireports.reports.hts;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
