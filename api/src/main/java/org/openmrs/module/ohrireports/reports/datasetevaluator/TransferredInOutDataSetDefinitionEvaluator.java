@@ -39,8 +39,6 @@ import org.openmrs.module.reporting.evaluation.querybuilder.HqlQueryBuilder;
 import org.openmrs.module.reporting.evaluation.service.EvaluationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import net.sf.cglib.core.Local;
-
 /*
  * 
  * =================================================== Report Name ====================================================================
@@ -124,15 +122,18 @@ public class TransferredInOutDataSetDefinitionEvaluator implements DataSetEvalua
 		this.evalContext = evalContext;
 		SimpleDataSet dataSet = new SimpleDataSet(tDataSetDefinition, this.evalContext);
 		
-		if (tDataSetDefinition.getEndDate() == null)
+		if (tDataSetDefinition.getEndDate().equals(null))
 			tDataSetDefinition.setEndDate(Calendar.getInstance().getTime());
 		
-		List<Patient> patients = getTransferredPatients();
+		List<Patient> patients = getPatientsWithArt();
 		transferredConcept = conceptService.getConceptByUuid(TRANSFERRED_UUID);
 		for (Patient patient : patients) {
 			Obs artStartDate = getArtStartDate(patient);
-			if (artStartDate == null)
+			
+			//exclude if patient is not doesn't have art start date
+			if (artStartDate.equals(null))
 				continue;
+			
 			Obs obs = getPatientFollowUpStatus(patient);
 			DataSetRow row = new DataSetRow();
 			row.addColumnValue(new DataSetColumn("personID", "#", Integer.class), patient.getPersonId());
@@ -144,7 +145,7 @@ public class TransferredInOutDataSetDefinitionEvaluator implements DataSetEvalua
 			row.addColumnValue(new DataSetColumn("art-start-date", "Art Start Date", Date.class),
 			    artStartDate.getValueDate());
 			row.addColumnValue(new DataSetColumn("last-follow-up", "Last Follow-up Date", Date.class),
-			    GetLastFollowUp(patient.getPerson()));
+			    getLastFollowUp(patient.getPerson()));
 			row.addColumnValue(new DataSetColumn("adherence", "Adherence", String.class), getAdherence(patient.getPerson()));
 			row.addColumnValue(new DataSetColumn("regimen", "Regimen", String.class),
 			    getLastArtRegiment(patient.getPerson()));
@@ -163,9 +164,9 @@ public class TransferredInOutDataSetDefinitionEvaluator implements DataSetEvalua
 	}
 	
 	/*
-	* Get patients on Art 
-	*/
-	private List<Patient> getTransferredPatients() {
+	 * Get patients on Art
+	 */
+	private List<Patient> getPatientsWithArt() {
 		
 		return evaluationService.evaluateToList(
 		    new HqlQueryBuilder()
@@ -189,7 +190,7 @@ public class TransferredInOutDataSetDefinitionEvaluator implements DataSetEvalua
 		                tDataSetDefinition.getEndDate()).limit(1).orderDesc("obs.obsDatetime"), String.class, evalContext);
 	}
 	
-	private Object GetLastFollowUp(Person person) {
+	private String getLastFollowUp(Person person) {
 		EncounterType encounterType = new EncounterType();
 		encounterType = evaluationService.evaluateToObject(
 		    new HqlQueryBuilder()

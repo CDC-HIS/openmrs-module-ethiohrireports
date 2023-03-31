@@ -53,6 +53,10 @@ public class OHRIReportsConstants {
 	
 	public final static String ALL_PATIENTS_COHORT_UUID = "895d0025-84e2-4306-bdd9-66acc150ec21";
 	
+	public final static String MRN_PATIENT_IDENTIFIERS = "52c28db7-09fb-4d33-8f9f-4500347256b6";
+	
+	public final static String OPENMRS_PATIENT_IDENTIFIERS = "05a29f94-c0ed-11e2-94be-8c13b969e334";
+	
 	/**
 	 * Associated Concepts
 	 */
@@ -161,7 +165,7 @@ public class OHRIReportsConstants {
 	
 	public final static String COVID19_SYMPTOM_SNEEZING = "126319AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 	
-	public final static String COVID19_SYMPTOM_SORE_THROAT = "158843AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+	public final static String CgetMRNOVID19_SYMPTOM_SORE_THROAT = "158843AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 	
 	public final static String COVID19_SYMPTOM_TIREDNESS = "124628AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 	
