@@ -6,7 +6,11 @@ import java.util.List;
 import static org.openmrs.module.ohrireports.OHRIReportsConstants.HTS_FOLLOW_UP_ENCOUNTER_TYPE;
 
 import org.openmrs.api.context.Context;
+import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.AutoCalculateDataSetDefinition;
+import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.BreastFeedingStatusDataSetDefinition;
+import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.CoarseByAgeAndSexDataSetDefinition;
 import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.DatimTxNewDataSetDefinition;
+import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.FineByAgeAndSexDataSetDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.module.reporting.evaluation.parameter.Parameterizable;
@@ -56,12 +60,35 @@ public class DatimTxNewReport implements ReportManager {
 		reportDefinition.setName(getName());
 		reportDefinition.setDescription(getDescription());
 		reportDefinition.setParameters(getParameters());
-		DatimTxNewDataSetDefinition dataSetDefinition = new DatimTxNewDataSetDefinition();
-		dataSetDefinition.addParameters(getParameters());
-		dataSetDefinition.setEncounterType(Context.getEncounterService()
-		        .getEncounterTypeByUuid(HTS_FOLLOW_UP_ENCOUNTER_TYPE));
-		reportDefinition.addDataSetDefinition("Tx-New-ADX",
-		    map(dataSetDefinition, "startDate=${startDateGC},endDate=${endDateGC}"));
+		
+		AutoCalculateDataSetDefinition aDefinition = new AutoCalculateDataSetDefinition();
+		aDefinition.addParameters(getParameters());
+		aDefinition.setEncounterType(Context.getEncounterService().getEncounterTypeByUuid(HTS_FOLLOW_UP_ENCOUNTER_TYPE));
+		aDefinition.setDescription("Number of adults and children newly enrolled on antiretroviral therapy (ART)");
+		reportDefinition.addDataSetDefinition("Auto-Calculate",
+		    map(aDefinition, "startDate=${startDateGC},endDate=${endDateGC}"));
+		
+		FineByAgeAndSexDataSetDefinition fDefinition = new FineByAgeAndSexDataSetDefinition();
+		fDefinition.addParameters(getParameters());
+		fDefinition.setDescription("Disaggregated by Age/Sex (Fine disaggregate)");
+		fDefinition.setEncounterType(Context.getEncounterService().getEncounterTypeByUuid(HTS_FOLLOW_UP_ENCOUNTER_TYPE));
+		reportDefinition.addDataSetDefinition("Required", map(fDefinition, "startDate=${startDateGC},endDate=${endDateGC}"));
+		
+		CoarseByAgeAndSexDataSetDefinition cDefinition = new CoarseByAgeAndSexDataSetDefinition();
+		cDefinition.addParameters(getParameters());
+		cDefinition.setEncounterType(Context.getEncounterService().getEncounterTypeByUuid(HTS_FOLLOW_UP_ENCOUNTER_TYPE));
+		cDefinition.setDescription("Disaggregated by Age/Sex (Coarse disaggregated)");
+		reportDefinition.addDataSetDefinition("Conditional",
+		    map(cDefinition, "startDate=${startDateGC},endDate=${endDateGC}"));
+		
+		BreastFeedingStatusDataSetDefinition bDefinition = new BreastFeedingStatusDataSetDefinition();
+		bDefinition.addParameters(getParameters());
+		bDefinition.setEncounterType(Context.getEncounterService().getEncounterTypeByUuid(HTS_FOLLOW_UP_ENCOUNTER_TYPE));
+		bDefinition.setDescription("Disaggregated by Breastfeeding Status at ART Initiation");
+		
+		reportDefinition.addDataSetDefinition("Breast-Feeding-Status",
+		    map(bDefinition, "startDate=${startDateGC},endDate=${endDateGC}"));
+		
 		return reportDefinition;
 	}
 	

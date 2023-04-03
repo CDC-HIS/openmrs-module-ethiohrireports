@@ -3,12 +3,14 @@ package org.openmrs.module.ohrireports.reports.datasetdefinition.datim;
 import java.util.Date;
 
 import org.openmrs.EncounterType;
+import org.openmrs.module.reporting.dataset.definition.BaseDataSetDefinition;
 import org.openmrs.module.reporting.definition.configuration.ConfigurationProperty;
 import org.springframework.stereotype.Component;
 
 @Component
-public class AutoCalculateDateSetDefinition {
-    @ConfigurationProperty
+public class AutoCalculateDataSetDefinition extends BaseDataSetDefinition {
+	
+	@ConfigurationProperty
 	private Date startDate;
 	
 	@ConfigurationProperty

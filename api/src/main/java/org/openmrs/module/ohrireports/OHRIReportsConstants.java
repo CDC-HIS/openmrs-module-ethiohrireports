@@ -57,6 +57,10 @@ public class OHRIReportsConstants {
 	
 	public final static String OPENMRS_PATIENT_IDENTIFIERS = "05a29f94-c0ed-11e2-94be-8c13b969e334";
 	
+	public final static String CURRENTLY_BREAST_FEEDING_CHILD = "5632AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+	
+	public final static String BREAST_FEEDING_YES = "1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+	
 	/**
 	 * Associated Concepts
 	 */
