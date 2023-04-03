@@ -88,6 +88,8 @@ public class TX_CUR_ReportAdx implements ReportManager {
 		    HTS_FOLLOW_UP_ENCOUNTER_TYPE));
 		reportDefinition.addDataSetDefinition("Tx-Curr Aggregate by Age and Gender",
 		    map(txCurrDataSetDefinition, "endDate=${endDateGC}"));
+		reportDefinition.addDataSetDefinition("Tx-Curr-one", map(txCurrDataSetDefinition, "endDate=${endDateGC}"));
+		reportDefinition.addDataSetDefinition("Tx-Curr-two", map(txCurrDataSetDefinition, "endDate=${endDateGC}"));
 		return reportDefinition;
 	}
 	

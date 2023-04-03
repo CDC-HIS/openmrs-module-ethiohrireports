@@ -1,20 +1,12 @@
-/**
- * This Source Code Form is subject to the terms of the Mozilla Public License,
- * v. 2.0. If a copy of the MPL was not distributed with this file, You can
- * obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
- * the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
- * <p>
- * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
- * graphic logo is a trademark of OpenMRS Inc.
- */
-package org.openmrs.module.ohrireports.reports.hts;
+package org.openmrs.module.ohrireports.reports.datim;
 
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import static org.openmrs.module.ohrireports.OHRIReportsConstants.HTS_FOLLOW_UP_ENCOUNTER_TYPE;
 
 import org.openmrs.api.context.Context;
-import org.openmrs.module.ohrireports.reports.datasetdefinition.TransferredInOutDataSetDefinition;
+import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.DatimTxNewDataSetDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.module.reporting.evaluation.parameter.Parameterizable;
@@ -25,24 +17,23 @@ import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.openmrs.module.reporting.report.manager.ReportManager;
 import org.openmrs.module.reporting.report.manager.ReportManagerUtil;
 import org.springframework.stereotype.Component;
-import static org.openmrs.module.ohrireports.OHRIReportsConstants.HTS_FOLLOW_UP_ENCOUNTER_TYPE;
 
 @Component
-public class TransferInOutReport implements ReportManager {
+public class DatimTxNewReport implements ReportManager {
 	
 	@Override
 	public String getUuid() {
-		return "af7c1fe6-d669-414e-b066-e9733f0de7a8";
+		return "7529482a-e57c-47d3-9dc3-57c4ad9e28bf";
 	}
 	
 	@Override
 	public String getName() {
-		return "Transferred In/Out";
+		return "DATIM-Tx-New";
 	}
 	
 	@Override
 	public String getDescription() {
-		return null;
+		return "Aggregate report of DATIM TXnew lists a newly enrolled  patients";
 	}
 	
 	@Override
@@ -56,7 +47,6 @@ public class TransferInOutReport implements ReportManager {
 		Parameter endDateGC = new Parameter("endDateGC", " ", Date.class);
 		endDateGC.setRequired(false);
 		return Arrays.asList(startDate, startDateGC, endDate, endDateGC);
-		
 	}
 	
 	@Override
@@ -66,13 +56,12 @@ public class TransferInOutReport implements ReportManager {
 		reportDefinition.setName(getName());
 		reportDefinition.setDescription(getDescription());
 		reportDefinition.setParameters(getParameters());
-		
-		TransferredInOutDataSetDefinition tDataSetDefinition = new TransferredInOutDataSetDefinition();
-		tDataSetDefinition.addParameters(getParameters());
-		tDataSetDefinition.setEncounterType(Context.getEncounterService().getEncounterTypeByUuid(
-		    HTS_FOLLOW_UP_ENCOUNTER_TYPE));
-		reportDefinition.addDataSetDefinition("TransferredInOut",
-		    map(tDataSetDefinition, "startDate=${startDateGC},endDate=${endDateGC}"));
+		DatimTxNewDataSetDefinition dataSetDefinition = new DatimTxNewDataSetDefinition();
+		dataSetDefinition.addParameters(getParameters());
+		dataSetDefinition.setEncounterType(Context.getEncounterService()
+		        .getEncounterTypeByUuid(HTS_FOLLOW_UP_ENCOUNTER_TYPE));
+		reportDefinition.addDataSetDefinition("Tx-New-ADX",
+		    map(dataSetDefinition, "startDate=${startDateGC},endDate=${endDateGC}"));
 		return reportDefinition;
 	}
 	
@@ -88,9 +77,10 @@ public class TransferInOutReport implements ReportManager {
 	
 	@Override
 	public List<ReportDesign> constructReportDesigns(ReportDefinition reportDefinition) {
-		ReportDesign design = ReportManagerUtil.createExcelDesign("08c71152-c552-42e7-b094-f510ff44e9cb", reportDefinition);
+		ReportDesign design = ReportManagerUtil.createExcelDesign("43cc0259-0c07-44c6-a4f5-0201fcb2d55d", reportDefinition);
 		
 		return Arrays.asList(design);
+		
 	}
 	
 	@Override
@@ -101,6 +91,7 @@ public class TransferInOutReport implements ReportManager {
 	@Override
 	public String getVersion() {
 		return "1.0.0-SNAPSHOT";
+		
 	}
 	
 }
