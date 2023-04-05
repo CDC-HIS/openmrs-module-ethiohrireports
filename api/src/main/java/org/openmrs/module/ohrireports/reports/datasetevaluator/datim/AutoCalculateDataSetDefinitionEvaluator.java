@@ -58,7 +58,7 @@ public class AutoCalculateDataSetDefinitionEvaluator implements DataSetEvaluator
 		queryBuilder.select("Distinct obs.personId").from(Obs.class, "obs")
 		        .whereEqual("obs.encounter.encounterType", hdsd.getEncounterType()).and()
 		        .whereEqual("obs.concept", artConcept).and().whereGreaterOrEqualTo("obs.valueDatetime", hdsd.getStartDate())
-		        .and().whereLessOrEqualTo("obs.valueDatetime", hdsd.getEndDate()).orderDesc("obs.obsDatetime");
+		        .and().whereLessOrEqualTo("obs.valueDatetime", hdsd.getEndDate());
 		
 		List<Integer> personIDList = evaluationService.evaluateToList(queryBuilder, Integer.class, context);
 		return personIDList.size();

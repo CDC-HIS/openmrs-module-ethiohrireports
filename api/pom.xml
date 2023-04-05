@@ -9,7 +9,7 @@
 
 	<artifactId>ohrireports-api</artifactId>
 	<packaging>jar</packaging>
-	<name>OHRI Reports API</name>
+	<name>ETHIOHRI Reports API</name>
 	<description>API project for OHRI Reports</description>
 
 	<dependencies>

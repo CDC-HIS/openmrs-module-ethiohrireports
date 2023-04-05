@@ -4,6 +4,7 @@ import static org.openmrs.module.ohrireports.OHRIReportsConstants.ART_START_DATE
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.openmrs.Concept;
 import org.openmrs.Obs;
@@ -30,7 +31,7 @@ public class FineByAgeAndSexDataSetDefinitionEvaluator implements DataSetEvaluat
 
     private FineByAgeAndSexDataSetDefinition hdsd;
     private Concept artConcept;
-    private String title = "Number of adults and children newly enrolled on antiretroviral therapy (ART)";
+    private int total = 0;
     @Autowired
     private ConceptService conceptService;
 
@@ -43,83 +44,116 @@ public class FineByAgeAndSexDataSetDefinitionEvaluator implements DataSetEvaluat
     @Override
     public DataSet evaluate(DataSetDefinition dataSetDefinition, EvaluationContext evalContext)
             throws EvaluationException {
-
+        total = 0;
         hdsd = (FineByAgeAndSexDataSetDefinition) dataSetDefinition;
         context = evalContext;
         artConcept = conceptService.getConceptByUuid(ART_START_DATE);
         SimpleDataSet set = new SimpleDataSet(dataSetDefinition, evalContext);
 
-        DataSetRow femaleDateSet = new DataSetRow();
+        // Female aggregation
         obses = LoadObs("F");
-        femaleDateSet.addColumnValue(new DataSetColumn("FineByAgeAndSexData", "Gender",
-                Integer.class), "Female");
-        femaleDateSet.addColumnValue(new DataSetColumn("unkownAge", "Unkown Age", Integer.class),
-                getEnrolledByAgeAndGender(0, 0, "F"));
-
-        femaleDateSet.addColumnValue(new DataSetColumn("<1", "Below One (<1)", Integer.class),
-                getEnrolledByAgeAndGender(0, 1, "F"));
-
+        DataSetRow femaleDateSet = new DataSetRow();
         buildDataSet(femaleDateSet, "F");
-
-
-
         set.addRow(femaleDateSet);
+
+        // Male aggregation
         obses = LoadObs("M");
         DataSetRow maleDataSet = new DataSetRow();
-        maleDataSet.addColumnValue(new DataSetColumn("FineByAgeAndSexData", "Gender",
-                Integer.class), "Male");
-        maleDataSet.addColumnValue(new DataSetColumn("unkownAge", "Unkown Age", Integer.class),
-                getEnrolledByAgeAndGender(0, 0, "M"));
-
-        maleDataSet.addColumnValue(new DataSetColumn("<1", "Below One (<1)", Integer.class),
-                getEnrolledByAgeAndGender(0, 1, "M"));
-
         buildDataSet(maleDataSet, "M");
-
         set.addRow(maleDataSet);
         return set;
     }
 
     private void buildDataSet(DataSetRow dataSet, String gender) {
-        minCount = 0;
+        total = 0;
+        minCount = 1;
         maxCount = 4;
-        while (maxCount >= 49) {
-            if (maxCount == 49) {
-                dataSet.addColumnValue(new DataSetColumn("50+", "50+", Integer.class),
-                        getEnrolledByAgeAndGender(50, 50, gender));
+        dataSet.addColumnValue(new DataSetColumn("FineByAgeAndSexData", "Gender",
+                Integer.class), gender.equals("F") ? "Female" : "Male");
+        dataSet.addColumnValue(new DataSetColumn("unknownAge", "Unknown Age", Integer.class),
+                getEnrolledByUnknownAge());
+
+        dataSet.addColumnValue(new DataSetColumn("<1", "Below One (<1)", Integer.class),
+                getEnrolledBelowOneYear());
+
+        while (minCount <= 65) {
+            if (minCount == 65) {
+                dataSet.addColumnValue(new DataSetColumn("65+", "65", Integer.class),
+                        getEnrolledByAgeAndGender(65, 200, gender));
             } else {
                 dataSet.addColumnValue(
                         new DataSetColumn(minCount + "-" + maxCount, minCount + "-" + maxCount, Integer.class),
                         getEnrolledByAgeAndGender(minCount, maxCount, gender));
             }
-
-            minCount=minCount+maxCount;
-            maxCount = minCount + 5;
+            minCount = maxCount + 1;
+            maxCount = minCount + 4;
         }
+        dataSet.addColumnValue(new DataSetColumn("Sub-total", "Subtotal", Integer.class),
+                total);
     }
 
     private int getEnrolledByAgeAndGender(int min, int max, String gender) {
-        int count =0;
-       List<Integer> persoIntegers = new ArrayList<>();
+        int count = 0;
+        List<Integer> personIds = new ArrayList<>();
         for (Obs obs : obses) {
-            if (persoIntegers.contains(obs.getPersonId()))
+
+            if (personIds.contains(obs.getPersonId()))
                 continue;
-           if (min >= 50 && max >= 50 && obs.getPerson().getAge() <=50) {
-                count++;
-            } else if (obs.getPerson().getAge() >= min && obs.getPerson().getAge() <= max) {
+
+            if (obs.getPerson().getAge() >= min && obs.getPerson().getAge() <= max) {
+                personIds.add(obs.getPersonId());
                 count++;
             }
-
-            persoIntegers.add(obs.getPersonId());
         }
-
-        clearCountedPerson(persoIntegers);
+        incrementTotalCount(count);
+        clearCountedPerson(personIds);
         return count;
+    }
+
+    private int getEnrolledByUnknownAge() {
+        int count = 0;
+        List<Integer> personIds = new ArrayList<>();
+        for (Obs obs : obses) {
+            if (personIds.contains(obs.getPersonId()))
+                continue;
+
+            if (Objects.isNull(obs.getPerson().getAge()) ||
+                    obs.getPerson().getAge() <= 0) {
+                count++;
+                personIds.add(obs.getPersonId());
+            }
+
+        }
+        incrementTotalCount(count);
+        clearCountedPerson(personIds);
+        return count;
+    }
+
+    private int getEnrolledBelowOneYear() {
+        int count = 0;
+        List<Integer> personIds = new ArrayList<>();
+        for (Obs obs : obses) {
+            if (personIds.contains(obs.getPersonId()))
+                continue;
+
+            if ((obs.getPerson().getAge() < 1)) {
+                count++;
+                personIds.add(obs.getPersonId());
+            }
+        }
+        incrementTotalCount(count);
+        clearCountedPerson(personIds);
+        return count;
+    }
+
+    private void incrementTotalCount(int count) {
+        if (count > 0)
+            total = total + count;
     }
 
     private void clearCountedPerson(List<Integer> personIds) {
         for (int pId : personIds) {
-            obses.removeIf(p->p.getPersonId().equals(pId));
+            obses.removeIf(p -> p.getPersonId().equals(pId));
         }
     }
 

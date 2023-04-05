@@ -10,7 +10,6 @@ import org.openmrs.Concept;
 import org.openmrs.Obs;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.ConceptService;
-import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.AutoCalculateDataSetDefinition;
 import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.BreastFeedingStatusDataSetDefinition;
 import org.openmrs.module.reporting.dataset.DataSet;
 import org.openmrs.module.reporting.dataset.DataSetColumn;
@@ -32,8 +31,6 @@ public class BreastFeedingDataSetDefinitionEvaluator implements DataSetEvaluator
 	private BreastFeedingStatusDataSetDefinition hdsd;
 	
 	private Concept artConcept, breastFeeding, breastFeedingYes;
-	
-	private String title = "Number of adults and children newly enrolled on antiretroviral therapy (ART)";
 	
 	@Autowired
 	private ConceptService conceptService;
@@ -63,7 +60,7 @@ public class BreastFeedingDataSetDefinitionEvaluator implements DataSetEvaluator
 		        .whereEqual("obs.encounter.encounterType", hdsd.getEncounterType()).and()
 		        .whereEqual("obs.person.gender", "F").and().whereEqual("obs.concept", artConcept).and()
 		        .whereGreaterOrEqualTo("obs.valueDatetime", hdsd.getStartDate()).and()
-		        .whereLessOrEqualTo("obs.valueDatetime", hdsd.getEndDate()).orderDesc("obs.obsDatetime");
+		        .whereLessOrEqualTo("obs.valueDatetime", hdsd.getEndDate());
 		
 		List<Integer> personIDList = evaluationService.evaluateToList(queryBuilder, Integer.class, context);
 		return personIDList;
@@ -72,7 +69,7 @@ public class BreastFeedingDataSetDefinitionEvaluator implements DataSetEvaluator
 	public int getNumberOfEnrolledBreastFeeding() {
 		List<Integer> pList = getTotalEnrolledFemalePatients();
 		HqlQueryBuilder queryBuilder = new HqlQueryBuilder();
-		queryBuilder.select("distinct obs.personId").from(Obs.class, "obs").whereEqual("ob.concept", breastFeeding).and()
+		queryBuilder.select("distinct obs.personId").from(Obs.class, "obs").whereEqual("obs.concept", breastFeeding).and()
 		        .whereEqual("obs.valueCoded", breastFeedingYes).and().whereIn("obs.personId", pList);
 		List<Integer> personIDs = evaluationService.evaluateToList(queryBuilder, Integer.class, context);
 		return personIDs.size();
