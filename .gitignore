@@ -9,6 +9,7 @@ target
 *.releaseBackup
 release.properties
 README.html
+openmrs-runtime.properties
 
 # Package Files #
 *.jar
