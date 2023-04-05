@@ -111,8 +111,8 @@ public class HTsNewDataSetDefinitionEvaluator implements DataSetEvaluator {
         queryBuilder.select("obv.personId")
         .from(Obs.class,"obv")  
 		.and()
-		.whereEqual("obv.concept", conceptService.getConceptByUuid(REASON_FOR_ART_ELIGABLITY)).and()
-		.whereNotInAny("obv.valueCoded",Arrays.asList(conceptService.getConceptByUuid(TRANSFERE_IN)))
+		.whereEqual("obv.concept", conceptService.getConceptByUuid(REASON_FOR_ART_ELIGIBILITY)).and()
+		.whereNotInAny("obv.valueCoded",Arrays.asList(conceptService.getConceptByUuid(TRANSFERRED_IN)))
 		.and()
 		.whereEqual("obv.encounter.encounterType", hdsd.getEncounterType()).and()
 		  	

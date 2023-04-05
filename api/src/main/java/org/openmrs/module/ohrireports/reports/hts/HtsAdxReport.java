@@ -35,34 +35,34 @@
 
 // @Component
 // public class HtsAdxReport implements ReportManager {
-	
+
 // 	private Log log = LogFactory.getLog(this.getClass());
-	
+
 // 	public static final String ADX_REPORT_RESOURCE_NAME = "adx-hiv_data.xml";
-	
+
 // 	@Autowired
 // 	HtsIndicatorLibrary hil;
-	
+
 // 	@Override
 // 	public String getUuid() {
 // 		return "12f236b1-b0b5-4ecc-9037-681c23fb45bd";
 // 	}
-	
+
 // 	@Override
 // 	public String getName() {
 // 		return "ADX-HIV Report";
 // 	}
-	
+
 // 	@Override
 // 	public String getDescription() {
 // 		return null;
 // 	}
-	
+
 // 	@Override
 // 	public List<Parameter> getParameters() {
 // 		return null;
 // 	}
-	
+
 // 	@Override
 // 	public ReportDefinition constructReportDefinition() {
 // 		ReportDefinition reportDefinition = new ReportDefinition();
@@ -70,12 +70,12 @@
 // 		reportDefinition.setName(getName());
 // 		reportDefinition.setDescription(getDescription());
 // 		reportDefinition.setParameters(getParameters());
-		
+
 // 		AllPatientsCohortDefinition allPatientsCohortDefinition = new AllPatientsCohortDefinition();
 // 		reportDefinition.setBaseCohortDefinition(Mapped.mapStraightThrough(allPatientsCohortDefinition));
-		
+
 // 		CohortIndicatorDataSetDefinition cidsd = new CohortIndicatorDataSetDefinition();
-		
+
 // 		//POSITIVES
 // 		cidsd.addColumn("lt1fp", "<1, Female, Positive", hil.getPatientsWithHtsIndicator(0, 0, 'F', '+'), "");
 // 		cidsd.addColumn("lt1mp", "<1, Male, Positive", hil.getPatientsWithHtsIndicator(0, 0, 'M', '+'), "");
@@ -101,7 +101,7 @@
 // 		cidsd.addColumn("45_49mp", "45-49, Male, Positive", hil.getPatientsWithHtsIndicator(45, 49, 'M', '+'), "");
 // 		cidsd.addColumn("gt50fp", "50+, Female, Positive", hil.getPatientsWithHtsIndicator(50, 9999, 'F', '+'), "");
 // 		cidsd.addColumn("gt50mp", "50+, Male, Positive", hil.getPatientsWithHtsIndicator(50, 9999, 'M', '+'), "");
-		
+
 // 		//NEGATIVES
 // 		cidsd.addColumn("lt1fn", "<1, Female, Negative", hil.getPatientsWithHtsIndicator(0, 0, 'F', '-'), "");
 // 		cidsd.addColumn("lt1mn", "<1, Male, Negative", hil.getPatientsWithHtsIndicator(0, 0, 'M', '-'), "");
@@ -127,15 +127,15 @@
 // 		cidsd.addColumn("45_49mn", "45-49, Male, Negative", hil.getPatientsWithHtsIndicator(45, 49, 'M', '-'), "");
 // 		cidsd.addColumn("gt50fn", "50+, Female, Negative", hil.getPatientsWithHtsIndicator(50, 9999, 'F', '-'), "");
 // 		cidsd.addColumn("gt50mn", "50+, Male, Negative", hil.getPatientsWithHtsIndicator(50, 9999, 'M', '-'), "");
-		
+
 // 		reportDefinition.addDataSetDefinition("HTS", cidsd, Collections.EMPTY_MAP);
 // 		return reportDefinition;
 // 	}
-	
+
 // 	@Override
 // 	public List<ReportDesign> constructReportDesigns(ReportDefinition reportDefinition) {
 // 		String reportDesignUuid = "4712289f-cb07-4d08-a507-141311dfd606";
-		
+
 // 		byte[] contents = new byte[0];
 // 		try {
 // 			File template = ResourceUtils.getFile("classpath:" + ADX_REPORT_RESOURCE_NAME);
@@ -144,12 +144,12 @@
 // 		catch (IOException e) {
 // 			log.error(e);
 // 		}
-		
+
 // 		ReportDesign reportDesign = createAdxTemplateDesign(reportDesignUuid, reportDefinition, contents);
-		
+
 // 		return Arrays.asList(reportDesign);
 // 	}
-	
+
 // 	private ReportDesign createAdxTemplateDesign(String reportDesignUuid, ReportDefinition reportDefinition, byte[] contents) {
 // 		ReportDesign design = new ReportDesign();
 // 		design.setUuid(reportDesignUuid);
@@ -165,12 +165,12 @@
 // 		design.addResource(resource);
 // 		return design;
 // 	}
-	
+
 // 	@Override
 // 	public List<ReportRequest> constructScheduledRequests(ReportDefinition reportDefinition) {
 // 		return null;
 // 	}
-	
+
 // 	@Override
 // 	public String getVersion() {
 // 		return "1.0.0-SNAPSHOT";

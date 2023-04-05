@@ -1,8 +1,8 @@
 package org.openmrs.module.ohrireports.reports.datasetevaluator;
 
 import static org.openmrs.module.ohrireports.OHRIReportsConstants.ART_START_DATE;
-import static org.openmrs.module.ohrireports.OHRIReportsConstants.REASON_FOR_ART_ELIGABLITY;
-import static org.openmrs.module.ohrireports.OHRIReportsConstants.TRANSFERE_IN;
+import static org.openmrs.module.ohrireports.OHRIReportsConstants.REASON_FOR_ART_ELIGIBILITY;
+import static org.openmrs.module.ohrireports.OHRIReportsConstants.TRANSFERRED_IN;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -134,8 +134,8 @@ public class HTsNewDataSetDefinitionEvaluatorAdx implements DataSetEvaluator {
         queryBuilder.select("obv.personId")
         .from(Obs.class,"obv")  
 		.and()
-		.whereEqual("obv.concept", conceptService.getConceptByUuid(REASON_FOR_ART_ELIGABLITY)).and()
-		.whereNotInAny("obv.valueCoded",Arrays.asList(conceptService.getConceptByUuid(TRANSFERE_IN)))
+		.whereEqual("obv.concept", conceptService.getConceptByUuid(REASON_FOR_ART_ELIGIBILITY)).and()
+		.whereNotInAny("obv.valueCoded",Arrays.asList(conceptService.getConceptByUuid(TRANSFERRED_IN)))
 		.and()
 		.whereEqual("obv.encounter.encounterType", hdsd.getEncounterType()).and()
 		  	
