@@ -53,6 +53,24 @@ public class TBARTAutoCalculateDataSetDefinitionEvaluator implements DataSetEval
 		set.addRow(dataSet);
 		return set;
 	}
+
+	private void buildDataSet(MapDataSet dataSet, String gender) {
+		dataSet.addData(new DataSetColumn("unknown", "Unknown", Integer.class), getNewlyEnrolledPatients(0, 0, gender));
+		dataSet.addData(new DataSetColumn("above", "<1 ", Integer.class), getNewlyEnrolledPatients(0, 1, gender));
+		for (int i = 1; i <= 50; i = i + 4) {
+			
+			if (i >= 46) {
+				dataSet.addData(new DataSetColumn("50+", "50+", Integer.class), getNewlyEnrolledPatients(i, i, gender));
+			} else if (i == 1) {
+				dataSet.addData(new DataSetColumn("1-4", "1-4", Integer.class), getNewlyEnrolledPatients(i, 4, gender));
+			} else {
+				dataSet.addData(new DataSetColumn(i + "-" + i + 4, i + "-" + i + 4, Integer.class),
+				    getNewlyEnrolledPatients(i, i + 4, gender));
+			}
+			
+		}
+		
+	}
 	
 	private void setRequiredConcepts() {
 		artConcept = conceptService.getConceptByUuid(ART_START_DATE);
