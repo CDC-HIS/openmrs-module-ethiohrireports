@@ -30,7 +30,7 @@ public class DatimTxNewReport implements ReportManager {
 	
 	@Override
 	public String getUuid() {
-		return "7529482a-e57c-47d3-9dc3-57c4ad9e28bf";
+		return "8b70b3dd-5e4d-4e68-bba1-10b31747b39b";
 	}
 	
 	@Override

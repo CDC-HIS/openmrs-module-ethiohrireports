@@ -66,7 +66,7 @@ public class TBARTNumeratorReport implements ReportManager {
 	
 	@Override
 	public List<ReportDesign> constructReportDesigns(ReportDefinition reportDefinition) {
-		ReportDesign design = ReportManagerUtil.createExcelDesign("43cc0259-0c07-44c6-a4f5-0201fcb2d55d", reportDefinition);
+		ReportDesign design = ReportManagerUtil.createExcelDesign("81fa27e6-4685-49e4-9e37-ae11e679f4d5", reportDefinition);
 		
 		return Arrays.asList(design);
 		
@@ -74,14 +74,12 @@ public class TBARTNumeratorReport implements ReportManager {
 	
 	@Override
 	public List<ReportRequest> constructScheduledRequests(ReportDefinition reportDefinition) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'constructScheduledRequests'");
+		return null;
 	}
 	
 	@Override
 	public String getVersion() {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'getVersion'");
+		return "1.0.0-SNAPSHOT";
 	}
 	
 }
