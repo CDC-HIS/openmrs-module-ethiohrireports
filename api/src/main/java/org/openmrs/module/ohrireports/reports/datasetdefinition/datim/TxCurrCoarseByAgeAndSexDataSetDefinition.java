@@ -8,7 +8,7 @@ import org.openmrs.module.reporting.definition.configuration.ConfigurationProper
 import org.springframework.stereotype.Component;
 
 @Component
-public class TBARTAutoCalculateDataSetDefinition extends BaseDataSetDefinition {
+public class TxCurrCoarseByAgeAndSexDataSetDefinition extends BaseDataSetDefinition {
 	
 	@ConfigurationProperty
 	private Date startDate;
@@ -18,17 +18,6 @@ public class TBARTAutoCalculateDataSetDefinition extends BaseDataSetDefinition {
 	
 	@ConfigurationProperty
 	private EncounterType encounterType;
-	
-	@ConfigurationProperty
-	private boolean isNewlyEnrolled;
-	
-	public void setNewlyEnrolled(boolean isNewlyEnrolled) {
-		this.isNewlyEnrolled = isNewlyEnrolled;
-	}
-	
-	public boolean getIsNewlyEnrolled() {
-		return false;
-	}
 	
 	public Date getStartDate() {
 		return startDate;

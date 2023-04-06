@@ -108,17 +108,16 @@ public class HTsNewDataSetDefinitionEvaluator implements DataSetEvaluator {
 		List<Integer> uniqPatientsId = new ArrayList<>();
 
 		HqlQueryBuilder queryBuilder = new HqlQueryBuilder();
-
-		queryBuilder.select("obv.personId")
-				.from(Obs.class, "obv")
-				.and()
-				.whereEqual("obv.concept", conceptService.getConceptByUuid(REASON_FOR_ART_ELIGIBILITY)).and()
-				.whereNotInAny("obv.valueCoded",
-				 Arrays.asList(conceptService.getConceptByUuid(TRANSFERRED_IN)))
-				.and()
-				.whereEqual("obv.encounter.encounterType", hdsd.getEncounterType()).and()
-
-				.orderDesc("obv.personId,obv.obsDatetime");
+      
+        queryBuilder.select("obv.personId")
+        .from(Obs.class,"obv")  
+		.and()
+		.whereEqual("obv.concept", conceptService.getConceptByUuid(REASON_FOR_ART_ELIGIBILITY)).and()
+		.whereNotInAny("obv.valueCoded",Arrays.asList(conceptService.getConceptByUuid(TRANSFERRED_IN)))
+		.and()
+		.whereEqual("obv.encounter.encounterType", hdsd.getEncounterType()).and()
+		  	
+        .orderDesc("obv.personId,obv.obsDatetime") ;
 		List<Integer> personIds = evaluationService.evaluateToList(queryBuilder, Integer.class, context);
 		for (Integer personId : personIds) {
 			if (!uniqPatientsId.contains(personId))
