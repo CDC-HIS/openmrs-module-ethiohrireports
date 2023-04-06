@@ -19,6 +19,17 @@ public class TBARTAutoCalculateDataSetDefinition extends BaseDataSetDefinition {
 	@ConfigurationProperty
 	private EncounterType encounterType;
 	
+	@ConfigurationProperty
+	private boolean isNewlyEnrolled;
+	
+	public void setNewlyEnrolled(boolean isNewlyEnrolled) {
+		this.isNewlyEnrolled = isNewlyEnrolled;
+	}
+	
+	public boolean getIsNewlyEnrolled() {
+		return false;
+	}
+	
 	public Date getStartDate() {
 		return startDate;
 	}

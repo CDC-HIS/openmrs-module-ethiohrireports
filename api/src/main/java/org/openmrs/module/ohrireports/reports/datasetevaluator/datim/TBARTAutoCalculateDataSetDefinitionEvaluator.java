@@ -32,9 +32,7 @@ public class TBARTAutoCalculateDataSetDefinitionEvaluator implements DataSetEval
 	
 	private TBARTAutoCalculateDataSetDefinition hdsd;
 	
-	private Concept artConcept,treatmentConcept,tbScreenDateConcept,
-	tbDiagnosticTestResultConcept,positiveConcept;
-	
+	private Concept artConcept, treatmentConcept, tbScreenDateConcept, tbDiagnosticTestResultConcept, positiveConcept;
 	
 	@Autowired
 	private ConceptService conceptService;
@@ -50,8 +48,7 @@ public class TBARTAutoCalculateDataSetDefinitionEvaluator implements DataSetEval
 		setRequiredConcepts();
 		
 		DataSetRow dataSet = new DataSetRow();
-		dataSet.addColumnValue(new DataSetColumn("adultAndChildrenEnrolled", "Numerator", Integer.class),
-		    getTotalEnrolledPatients());
+		dataSet.addColumnValue(new DataSetColumn("adultAndChildrenEnrolled", "Numerator", Integer.class), "");
 		SimpleDataSet set = new SimpleDataSet(dataSetDefinition, evalContext);
 		set.addRow(dataSet);
 		return set;
@@ -64,54 +61,39 @@ public class TBARTAutoCalculateDataSetDefinitionEvaluator implements DataSetEval
 		tbDiagnosticTestResultConcept = conceptService.getConceptByUuid(TB_DIAGNOSTIC_TEST_RESULT);
 		positiveConcept = conceptService.getConceptByUuid(POSITIVE);
 	}
-
+	
 	private List<Obs> getTotalPatients(String gender) {
 		HqlQueryBuilder queryBuilder = new HqlQueryBuilder();
-		queryBuilder.select("obs").from(Obs.class, "obs")
-					.whereEqual("obs.encounter.encounterType", hdsd.getEncounterType())
-					.and()
-					.whereEqual("obs.concept", artConcept)
-					.and();
-				if(hdsd.getIsNewlyEnrolled())
-				{
-					queryBuilder.whereBetweenInclusive("obs.valueDatetime", hdsd.getStartDate(), hdsd.getEndDate())
-
-				}else{
-					queryBuilder.whereLess("obs.valueDatetime", hdsd.getStartDate());
-				}
+		queryBuilder.select("obs").from(Obs.class, "obs").whereEqual("obs.encounter.encounterType", hdsd.getEncounterType())
+		        .and().whereEqual("obs.concept", artConcept).and();
+		if (hdsd.getIsNewlyEnrolled()) {
+			queryBuilder.whereBetweenInclusive("obs.valueDatetime", hdsd.getStartDate(), hdsd.getEndDate());
 			
+		} else {
+			queryBuilder.whereLess("obs.valueDatetime", hdsd.getStartDate());
+		}
+		
 		queryBuilder.whereIdIn("obs.personId", getPatientsWithTB());
-
+		
 		List<Obs> obses = evaluationService.evaluateToList(queryBuilder, Obs.class, context);
-
+		
 		return obses;
 	}
-
 	
-	private List<Integer> getOnTreatmentPatients(){
+	private List<Integer> getOnTreatmentPatients() {
 		HqlQueryBuilder queryBuilder = new HqlQueryBuilder();
-		queryBuilder.select("distinct obs.personId")
-					.from(Obs.class,"obs")
-					.whereEqual("obs.encounter.encounterType", hdsd.getEncounterType())
-					.and()
-					.whereEqual("obs.concept", TREATMENT_END_DATE)
-					.and()
-					.whereGreater("obs.valueDatetime", hdsd.getStartDate());
-				return evaluationService.evaluateToList(queryBuilder, Integer.class, context);
+		queryBuilder.select("distinct obs.personId").from(Obs.class, "obs")
+		        .whereEqual("obs.encounter.encounterType", hdsd.getEncounterType()).and()
+		        .whereEqual("obs.concept", TREATMENT_END_DATE).and().whereGreater("obs.valueDatetime", hdsd.getStartDate());
+		return evaluationService.evaluateToList(queryBuilder, Integer.class, context);
 	}
-
-	private List<Integer> getPatientsWithTB(){
+	
+	private List<Integer> getPatientsWithTB() {
 		HqlQueryBuilder queryBuilder = new HqlQueryBuilder();
-		queryBuilder.select("obs")
-					.from(Obs.class,"obs")
-					.whereEqual("obs.encounter.encounterType", hdsd.getEncounterType())
-					.and()
-					.whereEqual("obs.concept", TB_DIAGNOSTIC_TEST_RESULT)
-					.and()
-					.whereEqual("obs.valueCoded",POSITIVE)
-					.and()
-					.whereIdIn("obs.personId", getOnTreatmentPatients());
-			return evaluationService.evaluateToList(queryBuilder, Integer.class, context);
-
+		queryBuilder.select("obs").from(Obs.class, "obs").whereEqual("obs.encounter.encounterType", hdsd.getEncounterType())
+		        .and().whereEqual("obs.concept", TB_DIAGNOSTIC_TEST_RESULT).and().whereEqual("obs.valueCoded", POSITIVE)
+		        .and().whereIdIn("obs.personId", getOnTreatmentPatients());
+		return evaluationService.evaluateToList(queryBuilder, Integer.class, context);
+		
 	}
 }
