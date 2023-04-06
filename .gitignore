@@ -10,7 +10,7 @@ target
 release.properties
 README.html
 openmrs-runtime.properties
-.vscode
+.vscode/*
 # Package Files #
 *.jar
 *.war
