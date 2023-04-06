@@ -9,18 +9,18 @@
     </parent>
 
 	<groupId>org.openmrs.module</groupId>
-	<artifactId>ohrireports</artifactId>
+	<artifactId>Ethiohrireports</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
-	<name>OHRI Reports</name>
-	<description>OpenMRS module for Packaging OHRI Reports powered by the Reporting Module</description>
-	<url>https://github.com/UCSF-IGHS/openmrs-module-ohri-reports</url>
+	<name>EthiOHRI Reports</name>
+	<description>OpenMRS module for Packaging EthioOHRI Reports powered by the Reporting Module</description>
+	<url>https://github.com/CDC-HIS/EthiohriReporting-module</url>
 
 	<scm>
 		<connection>scm:git:git@github.com:UCSF-IGHS/openmrs-module-ohri-reports.git</connection>
-		<developerConnection>scm:git:git@github.com:UCSF-IGHS/openmrs-module-ohri-reports.git</developerConnection>
-		<url>https://github.com/UCSF-IGHS/openmrs-module-ohri-reports</url>
+		<developerConnection>scm:git:git@github.com:CDC-HIS/EthiohriReporting-module.git</developerConnection>
+		<url>https://github.com/CDC-HIS/EthiohriReporting-module</url>
 	</scm>
 
 	<modules>
