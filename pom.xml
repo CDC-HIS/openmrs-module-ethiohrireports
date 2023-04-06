@@ -13,9 +13,9 @@
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
-	<name>EthiOHRI Reports</name>
-	<description>OpenMRS module for Packaging EthioOHRI Reports powered by the Reporting Module</description>
-	<url>https://github.com/CDC-HIS/EthiohriReporting-module</url>
+	<name>ETHIOHRI Reports</name>
+	<description>OpenMRS module for Packaging OHRI Reports powered by the Reporting Module</description>
+	<url>https://github.com/UCSF-IGHS/openmrs-module-ohri-reports</url>
 
 	<scm>
 		<connection>scm:git:git@github.com:UCSF-IGHS/openmrs-module-ohri-reports.git</connection>
