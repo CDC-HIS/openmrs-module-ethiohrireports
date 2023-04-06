@@ -1,4 +1,4 @@
-package org.openmrs.module.ohrireports.reports.datasetdefinition.datim;
+package org.openmrs.module.ohrireports.reports.datasetdefinition.datim.tb_art;
 
 import java.util.Date;
 
@@ -18,17 +18,6 @@ public class TBARTAutoCalculateDataSetDefinition extends BaseDataSetDefinition {
 	
 	@ConfigurationProperty
 	private EncounterType encounterType;
-	
-	@ConfigurationProperty
-	private boolean isNewlyEnrolled;
-	
-	public void setNewlyEnrolled(boolean isNewlyEnrolled) {
-		this.isNewlyEnrolled = isNewlyEnrolled;
-	}
-	
-	public boolean getIsNewlyEnrolled() {
-		return false;
-	}
 	
 	public Date getStartDate() {
 		return startDate;

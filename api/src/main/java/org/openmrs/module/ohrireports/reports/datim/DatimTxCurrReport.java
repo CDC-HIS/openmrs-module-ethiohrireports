@@ -7,7 +7,6 @@ import static org.openmrs.module.ohrireports.OHRIReportsConstants.HTS_FOLLOW_UP_
 
 import org.openmrs.api.context.Context;
 import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.TxCurrAutoCalculateDataSetDefinition;
-import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.TxCurrBreastFeedingStatusDataSetDefinition;
 import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.TxCurrCoarseByAgeAndSexDataSetDefinition;
 import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.TxCurrFineByAgeAndSexDataSetDefinition;
 import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.TxCurrKeyPopulationTypeDataSetDefinition;

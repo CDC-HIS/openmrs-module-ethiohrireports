@@ -7,8 +7,12 @@ import static org.openmrs.module.ohrireports.OHRIReportsConstants.HTS_FOLLOW_UP_
 
 import org.openmrs.EncounterType;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.tb_art.TBARTAutoCalculateDataSetDefinition;
+import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.tb_art.TBARTDataSetDefinition;
+import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
-import org.openmrs.module.reporting.report.Report;
+import org.openmrs.module.reporting.evaluation.parameter.Parameterizable;
+import org.openmrs.module.reporting.evaluation.parameter.ParameterizableUtil;
 import org.openmrs.module.reporting.report.ReportDesign;
 import org.openmrs.module.reporting.report.ReportRequest;
 import org.openmrs.module.reporting.report.definition.ReportDefinition;
@@ -58,9 +62,29 @@ public class TBARTNumeratorReport implements ReportManager {
 		reportDefinition.setDescription(getDescription());
 		reportDefinition.setParameters(getParameters());
 		followUpEncounter = Context.getEncounterService().getEncounterTypeByUuid(HTS_FOLLOW_UP_ENCOUNTER_TYPE);
-		//Auto-calculate Numerator
-		//Disaggregated by Age/sex/result
-		//
+		
+		TBARTAutoCalculateDataSetDefinition tbADataSet = new TBARTAutoCalculateDataSetDefinition();
+		tbADataSet.addParameters(getParameters());
+		tbADataSet.setEncounterType(followUpEncounter);
+		reportDefinition
+		        .addDataSetDefinition(
+		            "Number of TB cases with documented HIV-positive status who start or continue ART during the reporting period. ",
+		            map(tbADataSet, "startDate=${startDateGC},endDate=${endDateGC}"));
+		
+		TBARTDataSetDefinition alreadyOnARTSetDefinition = new TBARTDataSetDefinition();
+		alreadyOnARTSetDefinition.addParameters(getParameters());
+		alreadyOnARTSetDefinition.setEncounterType(followUpEncounter);
+		alreadyOnARTSetDefinition.setNewlyEnrolled(false);
+		reportDefinition.addDataSetDefinition("Disaggregated by Age/Sex/Result Already on ARt",
+		    map(alreadyOnARTSetDefinition, "startDate=${startDateGC},endDate=${endDateGC}"));
+		
+		TBARTDataSetDefinition newlyEnrolledSetDefinition = new TBARTDataSetDefinition();
+		newlyEnrolledSetDefinition.addParameters(getParameters());
+		newlyEnrolledSetDefinition.setEncounterType(followUpEncounter);
+		newlyEnrolledSetDefinition.setNewlyEnrolled(false);
+		reportDefinition.addDataSetDefinition("Disaggregated by Age/Sex/Result Newly on ARt",
+		    map(newlyEnrolledSetDefinition, "startDate=${startDateGC},endDate=${endDateGC}"));
+		
 		return reportDefinition;
 	}
 	
@@ -70,6 +94,16 @@ public class TBARTNumeratorReport implements ReportManager {
 		
 		return Arrays.asList(design);
 		
+	}
+	
+	public static <T extends Parameterizable> Mapped<T> map(T parameterizable, String mappings) {
+		if (parameterizable == null) {
+			throw new IllegalArgumentException("Parameterizable cannot be null");
+		}
+		if (mappings == null) {
+			mappings = ""; // probably not necessary, just to be safe
+		}
+		return new Mapped<T>(parameterizable, ParameterizableUtil.createParameterMappings(mappings));
 	}
 	
 	@Override
