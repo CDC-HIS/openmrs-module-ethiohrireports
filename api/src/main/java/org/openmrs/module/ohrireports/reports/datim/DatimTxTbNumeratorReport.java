@@ -62,11 +62,11 @@ public class DatimTxTbNumeratorReport implements ReportManager {
 		TxTbNumeratorAutoCalculateDataSetDefinition aDefinition = new TxTbNumeratorAutoCalculateDataSetDefinition();
 		aDefinition.addParameters(getParameters());
 		aDefinition.setEncounterType(Context.getEncounterService().getEncounterTypeByUuid(HTS_FOLLOW_UP_ENCOUNTER_TYPE));
-		aDefinition.setDescription("Number of adults and children currently enrolling ART and has documented Active on TB treatment");
-		reportDefinition.addDataSetDefinition("Auto-Calculate : Number of ART patients who were started on TB treatment during the reporting period",
+		aDefinition
+		        .setDescription("Number of adults and children currently enrolling ART and has documented Active on TB treatment");
+		reportDefinition.addDataSetDefinition(
+		    "Auto-Calculate : Number of ART patients who were started on TB treatment during the reporting period",
 		    map(aDefinition, "startDate=${startDateGC},endDate=${endDateGC}"));
-		
-		
 		
 		TxTbNumeratorARTByAgeAndSexDataSetDefinition cDefinition = new TxTbNumeratorARTByAgeAndSexDataSetDefinition();
 		cDefinition.addParameters(getParameters());

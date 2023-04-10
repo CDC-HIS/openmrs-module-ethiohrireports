@@ -37,6 +37,8 @@ public class TxTbNumeratorARTByAgeAndSexDataSetDefinitionEvaluator implements Da
 	
 	private TxTbNumeratorARTByAgeAndSexDataSetDefinition hdsd;
 	private int total = 0;
+	private int maletotal = 0;
+	private int femaletotal = 0;
 		
 	// HashMap<Integer, Concept> patientStatus = new HashMap<>();
 	private String title = "Number of ART patients who were started on TB treatment during the reporting period";
@@ -54,25 +56,53 @@ public class TxTbNumeratorARTByAgeAndSexDataSetDefinitionEvaluator implements Da
 		hdsd = (TxTbNumeratorARTByAgeAndSexDataSetDefinition) dataSetDefinition;
 		context = evalContext;
 		total=0;
+		maletotal = 0;
+		femaletotal = 0;
 		SimpleDataSet set = new SimpleDataSet(dataSetDefinition, evalContext);
-		DataSetRow femaleDateSet = new DataSetRow();
-        obses = getPreviouslyOnART("F");
-		femaleDateSet.addColumnValue(new DataSetColumn("unkownAge", "Unkown Age", Integer.class),
+		DataSetRow newARTstarted = new DataSetRow();
+		obses = getARTstarted("F");
+		femaletotal+=obses.size();
+		newARTstarted.addColumnValue(new DataSetColumn("", "", String.class),
+        "The number of patients starting TB treatment who newly started ART during the reporting period");
+		newARTstarted.addColumnValue(new DataSetColumn("funkownAge", "Female Unkown Age", Integer.class),
         getUnknownAgeByGender());
-		femaleDateSet.addColumnValue(new DataSetColumn("<15", "<15", Integer.class),getEnrolledByAgeAndGender(0, 14));
-		set.addRow(femaleDateSet);
+		newARTstarted.addColumnValue(new DataSetColumn("f<15", "Female <15", Integer.class),getEnrolledByAgeAndGender(0, 14));
+		newARTstarted.addColumnValue(new DataSetColumn("f+15", "female +15", Integer.class),getEnrolledByAgeAndGender(15, 150));
+		obses = getARTstarted("M");
+		maletotal+=obses.size();
+		newARTstarted.addColumnValue(new DataSetColumn("munkownAge", "Male Unkown Age", Integer.class),
+        getUnknownAgeByGender());
+		newARTstarted.addColumnValue(new DataSetColumn("m<15", "Male <15", Integer.class),getEnrolledByAgeAndGender(0, 14));
+		newARTstarted.addColumnValue(new DataSetColumn("m+15", "Male +15", Integer.class),getEnrolledByAgeAndGender(15, 150));
+		set.addRow(newARTstarted);
+
+		DataSetRow oldARTstarted = new DataSetRow();
+		obses = getPreviouslyOnART("F");
+		femaletotal+=obses.size();
+		oldARTstarted.addColumnValue(new DataSetColumn("", "", String.class),
+        "The number of patients starting TB treatment who were already on ART prior to the start of the reporting period");
+		oldARTstarted.addColumnValue(new DataSetColumn("funkownAge", "Female Unkown Age", Integer.class),
+        getUnknownAgeByGender());
+		oldARTstarted.addColumnValue(new DataSetColumn("f<15", "Female <15", Integer.class),getEnrolledByAgeAndGender(0, 14));
+		oldARTstarted.addColumnValue(new DataSetColumn("f+15", "female +15", Integer.class),getEnrolledByAgeAndGender(15, 150));
 
 		obses = getPreviouslyOnART("M");
-		DataSetRow maleDataSet = new DataSetRow();
-		maleDataSet.addColumnValue(new DataSetColumn("unkownAge", "Unkown Age", Integer.class),
+		maletotal+=obses.size();
+		oldARTstarted.addColumnValue(new DataSetColumn("munkownAge", "Male Unkown Age", Integer.class),
         getUnknownAgeByGender());
-		maleDataSet.addColumnValue(new DataSetColumn("<15", "<15", Integer.class),getEnrolledByAgeAndGender(0, 14));
-		set.addRow(maleDataSet);
+		oldARTstarted.addColumnValue(new DataSetColumn("m<15", "Male <15", Integer.class),getEnrolledByAgeAndGender(0, 14));
+		oldARTstarted.addColumnValue(new DataSetColumn("m+15", "Male +15", Integer.class),getEnrolledByAgeAndGender(15, 150));
+		set.addRow(oldARTstarted);
 
         DataSetRow tSetRow = new DataSetRow();
+		tSetRow.addColumnValue(new DataSetColumn("funkownAge", "feSub-Total", Integer.class),
+                femaletotal);
+		tSetRow.addColumnValue(new DataSetColumn("munkownAge", "maleSub-Total", Integer.class),
+                maletotal);
         tSetRow.addColumnValue(new DataSetColumn("subtotal", "Sub-Total", Integer.class),
                 total);
         set.addRow(tSetRow);
+	
 		return set;
 	}
 	private int getUnknownAgeByGender(){
@@ -106,7 +136,7 @@ public class TxTbNumeratorARTByAgeAndSexDataSetDefinitionEvaluator implements Da
 			return obsARTstarted;
 		}
 		HqlQueryBuilder queryBuilder = new HqlQueryBuilder();
-		queryBuilder.select("obs").from(Obs.class,"obs").whereEqual("obs.concept", conceptService.getConceptByUuid(ART_START_DATE)).and().whereLess("obs.valueDatetime", hdsd.getStartDate()).orderDesc("obs.personId, obs.obsDatetime");
+		queryBuilder.select("obs").from(Obs.class,"obs").whereEqual("obs.concept", conceptService.getConceptByUuid(ART_START_DATE)).and().whereLess("obs.valueDatetime", hdsd.getStartDate()).and().whereIdIn("obs.personId", tbstarted).orderDesc("obs.personId, obs.obsDatetime");
 		for (Obs obs: evaluationService.evaluateToList(queryBuilder, Obs.class, context)){
 				if (!artstarted.contains(obs.getPersonId())){
 					artstarted.add(obs.getPersonId());
@@ -124,7 +154,7 @@ public class TxTbNumeratorARTByAgeAndSexDataSetDefinitionEvaluator implements Da
 			return obsARTstarted;
 		}
 		HqlQueryBuilder queryBuilder = new HqlQueryBuilder();
-		queryBuilder.select("obs").from(Obs.class,"obs").whereEqual("obs.concept", conceptService.getConceptByUuid(ART_START_DATE)).and().whereGreater("obs.valueDatetime", hdsd.getStartDate()).and().whereLess("obs.valueDatetime", hdsd.getEndDate()).orderDesc("obs.personId, obs.obsDatetime");
+		queryBuilder.select("obs").from(Obs.class,"obs").whereEqual("obs.concept", conceptService.getConceptByUuid(ART_START_DATE)).and().whereGreater("obs.valueDatetime", hdsd.getStartDate()).and().whereLess("obs.valueDatetime", hdsd.getEndDate()).and().whereIdIn("obs.personId", tbstarted).orderDesc("obs.personId, obs.obsDatetime");
 		for (Obs obs: evaluationService.evaluateToList(queryBuilder, Obs.class, context)){
 				if (!artstarted.contains(obs.getPersonId())){
 					artstarted.add(obs.getPersonId());
@@ -143,7 +173,7 @@ public class TxTbNumeratorARTByAgeAndSexDataSetDefinitionEvaluator implements Da
 			return tbstarted;
 		}
 		HqlQueryBuilder queryBuilder = new HqlQueryBuilder();
-		queryBuilder.select("obs").from(Obs.class,"obs").whereEqual("obs.concept", conceptService.getConceptByUuid(TB_TREATMENT_START_DATE)).and().whereGreater("obs.valueDatetime", hdsd.getStartDate()).and().whereLess("obs.valueDatetime",hdsd.getEndDate()).orderDesc("obs.personId, obs.obsDatetime");
+		queryBuilder.select("obs").from(Obs.class,"obs").whereEqual("obs.concept", conceptService.getConceptByUuid(TB_TREATMENT_START_DATE)).and().whereGreater("obs.valueDatetime", hdsd.getStartDate()).and().whereLess("obs.valueDatetime",hdsd.getEndDate()).and().whereIdIn("obs.personId", dispense).orderDesc("obs.personId, obs.obsDatetime");
 		obstbstarted=evaluationService.evaluateToList(queryBuilder,Obs.class,context);
 		for (Obs obs:obstbstarted){
 			if (!tbstarted.contains(obs.getPersonId())){
@@ -153,7 +183,7 @@ public class TxTbNumeratorARTByAgeAndSexDataSetDefinitionEvaluator implements Da
 		return tbstarted;
 	}
 	public List<Integer> getDispenseDose(String gender) {
-		List<Integer> pList = getDatimValidTratmentEndDatePatients();
+		List<Integer> pList = getDatimValidTratmentEndDatePatients(gender);
 		List<Integer> patients = new ArrayList<>();
 		if (pList == null || pList.size() == 0)
 			return patients;
@@ -169,9 +199,9 @@ public class TxTbNumeratorARTByAgeAndSexDataSetDefinitionEvaluator implements Da
 		return patients;	
 	}
 	
-	private List<Integer> getDatimValidTratmentEndDatePatients() {
+	private List<Integer> getDatimValidTratmentEndDatePatients(String gender) {
 
-		List<Integer> patientsId = getListOfALiveORRestartPatientObservertions();
+		List<Integer> patientsId = getListOfALiveORRestartPatientObservertions(gender);
 		List<Integer> patients = new ArrayList<>();
         if (patientsId == null || patientsId.size() == 0)
                 return patients;
@@ -198,7 +228,7 @@ public class TxTbNumeratorARTByAgeAndSexDataSetDefinitionEvaluator implements Da
 		return patients;
 	}
 	
-	private List<Integer> getListOfALiveORRestartPatientObservertions() {
+	private List<Integer> getListOfALiveORRestartPatientObservertions(String gender) {
 
 		List<Integer> uniqiObs = new ArrayList<>();
 		HqlQueryBuilder queryBuilder = new HqlQueryBuilder();
@@ -207,6 +237,8 @@ public class TxTbNumeratorARTByAgeAndSexDataSetDefinitionEvaluator implements Da
 				.from(Obs.class, "obs")
 				.whereEqual("obs.encounter.encounterType", hdsd.getEncounterType())
 				.and()
+				.whereEqual("obs.person.gender", gender)
+                .and()
 				.whereEqual("obs.concept", conceptService.getConceptByUuid(PATIENT_STATUS))
 				.and()
 				.whereIn("obs.valueCoded", Arrays.asList(conceptService.getConceptByUuid(ALIVE),conceptService.getConceptByUuid(RESTART)))

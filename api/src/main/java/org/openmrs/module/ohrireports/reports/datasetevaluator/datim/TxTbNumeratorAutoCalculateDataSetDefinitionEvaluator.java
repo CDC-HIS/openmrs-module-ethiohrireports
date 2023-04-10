@@ -35,7 +35,7 @@ public class TxTbNumeratorAutoCalculateDataSetDefinitionEvaluator implements Dat
 	private EvaluationContext context;
 	
 	private TxTbNumeratorAutoCalculateDataSetDefinition hdsd;
-		
+	
 	// HashMap<Integer, Concept> patientStatus = new HashMap<>();
 	private String title = "Number of ART patients who were started on TB treatment during the reporting period";
 	
@@ -53,7 +53,7 @@ public class TxTbNumeratorAutoCalculateDataSetDefinitionEvaluator implements Dat
 		
 		DataSetRow dataSet = new DataSetRow();
 		dataSet.addColumnValue(new DataSetColumn("adultAndChildrenEnrolled", "Numerator", Integer.class),
-		getTBstartedInReportingPeriod());
+		    getTBstartedInReportingPeriod());
 		SimpleDataSet set = new SimpleDataSet(dataSetDefinition, evalContext);
 		set.addRow(dataSet);
 		return set;
@@ -76,6 +76,7 @@ public class TxTbNumeratorAutoCalculateDataSetDefinitionEvaluator implements Dat
 		}
 		return tbstarted.size();
 	}
+	
 	public List<Integer> getDispenseDose() {
 		List<Integer> pList = getDatimValidTreatmentEndDatePatients();
 		List<Integer> patients = new ArrayList<>();
