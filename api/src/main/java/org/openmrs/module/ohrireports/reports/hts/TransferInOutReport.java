@@ -9,19 +9,12 @@
  */
 package org.openmrs.module.ohrireports.reports.hts;
 
-import static org.openmrs.module.ohrireports.OHRIReportsConstants.HTS_FOLLOW_UP_ENCOUNTER_TYPE;
-
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import org.openmrs.api.ConceptService;
-import org.openmrs.api.EncounterService;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.ohrireports.reports.datasetdefinition.TXCurrDataSetDefinitionAdx;
-import org.openmrs.module.ohrireports.reports.library.EncounterDataLibrary;
-import org.openmrs.module.ohrireports.reports.library.PatientDataLibrary;
+import org.openmrs.module.ohrireports.reports.datasetdefinition.TransferredInOutDataSetDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.module.reporting.evaluation.parameter.Parameterizable;
@@ -30,32 +23,21 @@ import org.openmrs.module.reporting.report.ReportDesign;
 import org.openmrs.module.reporting.report.ReportRequest;
 import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.openmrs.module.reporting.report.manager.ReportManager;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.openmrs.module.reporting.report.manager.ReportManagerUtil;
 import org.springframework.stereotype.Component;
+import static org.openmrs.module.ohrireports.OHRIReportsConstants.HTS_FOLLOW_UP_ENCOUNTER_TYPE;
 
 @Component
-public class TX_CUR_ReportAdx implements ReportManager {
-	
-	@Autowired
-	EncounterService encounterService;
-	
-	@Autowired
-	ConceptService conceptService;
-	
-	@Autowired
-	PatientDataLibrary hpdl;
-	
-	@Autowired
-	EncounterDataLibrary hedl;
+public class TransferInOutReport implements ReportManager {
 	
 	@Override
 	public String getUuid() {
-		return "4e79374e-b8a0-455e-a571-a9a9a801f113";
+		return "af7c1fe6-d669-414e-b066-e9733f0de7a8";
 	}
 	
 	@Override
 	public String getName() {
-		return "TX CURR ADX";
+		return "Transferred In/Out";
 	}
 	
 	@Override
@@ -65,12 +47,15 @@ public class TX_CUR_ReportAdx implements ReportManager {
 	
 	@Override
 	public List<Parameter> getParameters() {
-		
-		Parameter endDate = new Parameter("endDate", "On Month", Date.class);
-		endDate.setRequired(true);
+		Parameter startDate = new Parameter("startDate", "Start Date", Date.class);
+		startDate.setRequired(false);
+		Parameter startDateGC = new Parameter("startDateGC", " ", Date.class);
+		startDateGC.setRequired(false);
+		Parameter endDate = new Parameter("endDate", "End Date", Date.class);
+		endDate.setRequired(false);
 		Parameter endDateGC = new Parameter("endDateGC", " ", Date.class);
-		endDateGC.setRequired(true);
-		return Arrays.asList(endDate, endDateGC);
+		endDateGC.setRequired(false);
+		return Arrays.asList(startDate, startDateGC, endDate, endDateGC);
 		
 	}
 	
@@ -80,16 +65,14 @@ public class TX_CUR_ReportAdx implements ReportManager {
 		reportDefinition.setUuid(getUuid());
 		reportDefinition.setName(getName());
 		reportDefinition.setDescription(getDescription());
-		
 		reportDefinition.setParameters(getParameters());
-		TXCurrDataSetDefinitionAdx txCurrDataSetDefinition = new TXCurrDataSetDefinitionAdx();
-		txCurrDataSetDefinition.addParameters(getParameters());
-		txCurrDataSetDefinition.setEncounterType(Context.getEncounterService().getEncounterTypeByUuid(
+		
+		TransferredInOutDataSetDefinition tDataSetDefinition = new TransferredInOutDataSetDefinition();
+		tDataSetDefinition.addParameters(getParameters());
+		tDataSetDefinition.setEncounterType(Context.getEncounterService().getEncounterTypeByUuid(
 		    HTS_FOLLOW_UP_ENCOUNTER_TYPE));
-		reportDefinition.addDataSetDefinition("Tx-Curr Aggregate by Age and Gender",
-		    map(txCurrDataSetDefinition, "endDate=${endDateGC}"));
-		reportDefinition.addDataSetDefinition("Tx-Curr-one", map(txCurrDataSetDefinition, "endDate=${endDateGC}"));
-		reportDefinition.addDataSetDefinition("Tx-Curr-two", map(txCurrDataSetDefinition, "endDate=${endDateGC}"));
+		reportDefinition.addDataSetDefinition("TransferredInOut",
+		    map(tDataSetDefinition, "startDate=${startDateGC},endDate=${endDateGC}"));
 		return reportDefinition;
 	}
 	
@@ -104,14 +87,15 @@ public class TX_CUR_ReportAdx implements ReportManager {
 	}
 	
 	@Override
-	public List<ReportDesign> constructReportDesigns(ReportDefinition reportDefinition){
+	public List<ReportDesign> constructReportDesigns(ReportDefinition reportDefinition) {
+		ReportDesign design = ReportManagerUtil.createExcelDesign("08c71152-c552-42e7-b094-f510ff44e9cb", reportDefinition);
 		
-		return new ArrayList<>();
+		return Arrays.asList(design);
 	}
 	
 	@Override
 	public List<ReportRequest> constructScheduledRequests(ReportDefinition reportDefinition) {
-		return new ArrayList<>();
+		return null;
 	}
 	
 	@Override

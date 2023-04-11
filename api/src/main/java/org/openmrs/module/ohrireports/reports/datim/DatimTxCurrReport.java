@@ -123,7 +123,7 @@ public class DatimTxCurrReport implements ReportManager {
 	
 	@Override
 	public List<ReportDesign> constructReportDesigns(ReportDefinition reportDefinition) {
-		ReportDesign design = ReportManagerUtil.createExcelDesign("43cc0259-0c07-44c6-a4f5-0201fcb2d55d", reportDefinition);
+		ReportDesign design = ReportManagerUtil.createExcelDesign("bfe17f94-383a-472b-8eac-17fc5bef95a1`", reportDefinition);
 		
 		return Arrays.asList(design);
 		
