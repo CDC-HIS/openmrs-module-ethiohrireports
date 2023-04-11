@@ -95,12 +95,15 @@ public class TxTbNumeratorARTByAgeAndSexDataSetDefinitionEvaluator implements Da
 		set.addRow(oldARTstarted);
 
         DataSetRow tSetRow = new DataSetRow();
-		tSetRow.addColumnValue(new DataSetColumn("funkownAge", "feSub-Total", Integer.class),
+		tSetRow.addColumnValue(new DataSetColumn("", "", Integer.class),
+                "Sub-Total");
+		tSetRow.addColumnValue(new DataSetColumn("f<15", "feSub-Total", Integer.class),
                 femaletotal);
-		tSetRow.addColumnValue(new DataSetColumn("munkownAge", "maleSub-Total", Integer.class),
+		tSetRow.addColumnValue(new DataSetColumn("m<15", "maleSub-Total", Integer.class),
                 maletotal);
-        tSetRow.addColumnValue(new DataSetColumn("subtotal", "Sub-Total", Integer.class),
+		tSetRow.addColumnValue(new DataSetColumn("total", "Total", Integer.class),
                 total);
+        
         set.addRow(tSetRow);
 	
 		return set;
