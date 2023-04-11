@@ -30,7 +30,7 @@ public class OHRIReportsActivator extends BaseModuleActivator {
 	 * @see #started()
 	 */
 	public void started() {
-		log.info("Started OHRI Reports");
+		log.info("Started ETHIOHRI Reports");
 		setUpCohortsDefinitions();
 		
 		for (ReportManager reportManager : Context.getRegisteredComponents(ReportManager.class)) {
@@ -46,7 +46,7 @@ public class OHRIReportsActivator extends BaseModuleActivator {
 	 * @see #shutdown()
 	 */
 	public void shutdown() {
-		log.info("Shutdown OHRI Reports");
+		log.info("Shutdown ETHIOHRI Reports");
 	}
 	
 }

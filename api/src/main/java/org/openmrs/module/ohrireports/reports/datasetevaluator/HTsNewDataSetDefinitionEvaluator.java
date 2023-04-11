@@ -38,72 +38,73 @@ public class HTsNewDataSetDefinitionEvaluator implements DataSetEvaluator {
 	ConceptService conceptService;
 	
 	@Override
-	public DataSet evaluate(DataSetDefinition dataSetDefinition, EvaluationContext evalContext) throws EvaluationException {
-		
+	public DataSet evaluate(DataSetDefinition dataSetDefinition, EvaluationContext evalContext)
+			throws EvaluationException {
+
 		HtsNewDataSetDefinition hdsd = (HtsNewDataSetDefinition) dataSetDefinition;
-		
+
 		SimpleDataSet data = new SimpleDataSet(dataSetDefinition, evalContext);
-	
-		
+
 		List<Obs> obses = getObservations(hdsd, evalContext);
-		
+
 		DataSetRow row = null;
-     
-        List<Person> managObses = new ArrayList<>();
+
+		List<Person> managObses = new ArrayList<>();
 		for (Obs obs : obses) {
 
-            if(!managObses.contains(obs.getPerson())){
-                row = new DataSetRow();
+			if (!managObses.contains(obs.getPerson())) {
+				row = new DataSetRow();
 				EthiopianDate ethiopianDate = null;
 				try {
-					ethiopianDate=	EthiopianDateConverter.ToEthiopianDate(obs.getValueDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate() );
+					ethiopianDate = EthiopianDateConverter.ToEthiopianDate(
+							obs.getValueDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-                row.addColumnValue(new DataSetColumn("PersonID", "#", Integer.class), obs.getPersonId());
-                row.addColumnValue(new DataSetColumn("Name", "Name", String.class), obs.getPerson().getNames());
-                row.addColumnValue(new DataSetColumn("Age", "Age", Integer.class), obs.getPerson().getAge());
-                row.addColumnValue(new DataSetColumn("Gender", "Gender", Integer.class), obs.getPerson().getGender());
-                row.addColumnValue(new DataSetColumn("ArtStartDate", "Art Start Date", Date.class), obs.getValueDate());
-                row.addColumnValue(new DataSetColumn("ArtStartDateEth", "Art Start Date ETH", 
-				String.class),ethiopianDate.equals(null)? "": ethiopianDate.getDay()+"/"+ethiopianDate.getMonth()+"/"+ethiopianDate.getYear());
-				row.addColumnValue(new DataSetColumn("ArtStartDate", "Art StartDate", Date.class), obs.getValueDate());
-                row.addColumnValue(new DataSetColumn("Encounter", "Encounter Type", String.class), obs.getEncounter().getEncounterType().getName());
-				row.addColumnValue(new DataSetColumn("Regimen","Regmin",String.class), getRegmin(obs,evalContext));
-                managObses.add(obs.getPerson());
-                
-                data.addRow(row);
-            }
-		
+				row.addColumnValue(new DataSetColumn("PersonID", "#", Integer.class), obs.getPersonId());
+				row.addColumnValue(new DataSetColumn("Name", "Name", String.class), obs.getPerson().getNames());
+				row.addColumnValue(new DataSetColumn("Age", "Age", Integer.class), obs.getPerson().getAge());
+				row.addColumnValue(new DataSetColumn("Gender", "Gender", Integer.class), obs.getPerson().getGender());
+				row.addColumnValue(new DataSetColumn("ArtStartDate", "Art Start Date", Date.class), obs.getValueDate());
+				row.addColumnValue(new DataSetColumn("ArtStartDateEth", "Art Start Date ETH",
+						String.class),
+						ethiopianDate.equals(null) ? ""
+								: ethiopianDate.getDay() + "/" + ethiopianDate.getMonth() + "/"
+										+ ethiopianDate.getYear());
+								row.addColumnValue(new DataSetColumn("Regimen", "Regimen", String.class), getRegimen(obs, evalContext));
+				managObses.add(obs.getPerson());
+
+				data.addRow(row);
+			}
+
 		}
 		return data;
 	}
 	
-	private List<Obs> getObservations(HtsNewDataSetDefinition hdsd,EvaluationContext context) {
-      
-        List<Obs> obses =new ArrayList<>();
-       List<Integer> personIds = getPatientsWithARTStartedDate(hdsd, context);
-        HqlQueryBuilder queryBuilder = new HqlQueryBuilder();
-		queryBuilder.select("obv")
-        .from(Obs.class,"obv")
-		.whereInAny("obv.concept",conceptService.getConceptByUuid(ART_START_DATE))
-		.whereGreaterOrEqualTo("obv.valueDatetime", hdsd.getStartDate())
-		.and()
-		.whereEqual("obv.encounter.encounterType", hdsd.getEncounterType())
-		.and()
-		.whereLessOrEqualTo("obv.valueDatetime", hdsd.getEndDate())
-		.and()
-		.whereIn("obv.personId", personIds)
-		.orderDesc("obv.personId,obv.obsDatetime");
-        for (Object[] row : evaluationService.evaluateToList(queryBuilder, context)) {
-			obses.add((Obs)row[0]);
-		}
+	private List<Obs> getObservations(HtsNewDataSetDefinition hdsd, EvaluationContext context) {
 
-        return obses;
-    }
+		List<Obs> obses = new ArrayList<>();
+		List<Integer> personIds = getPatientsWithARTStartedDate(hdsd, context);
+		HqlQueryBuilder queryBuilder = new HqlQueryBuilder();
+		queryBuilder.select("obv")
+				.from(Obs.class, "obv")
+				.whereInAny("obv.concept", conceptService.getConceptByUuid(ART_START_DATE))
+				.whereGreaterOrEqualTo("obv.valueDatetime", hdsd.getStartDate())
+				.and()
+				.whereEqual("obv.encounter.encounterType", hdsd.getEncounterType())
+				.and()
+				.whereLessOrEqualTo("obv.valueDatetime", hdsd.getEndDate())
+				.and()
+				.whereIn("obv.personId", personIds)
+				.orderDesc("obv.personId,obv.obsDatetime");
+				obses = evaluationService.evaluateToList(queryBuilder, Obs.class,context);
 	
-	private List<Integer> getPatientsWithARTStartedDate(HtsNewDataSetDefinition hdsd, EvaluationContext context){
+
+		return obses;
+	}
+	
+	private List<Integer> getPatientsWithARTStartedDate(HtsNewDataSetDefinition hdsd, EvaluationContext context) {
 		List<Integer> uniqPatientsId = new ArrayList<>();
 
 		HqlQueryBuilder queryBuilder = new HqlQueryBuilder();
@@ -119,13 +120,13 @@ public class HTsNewDataSetDefinitionEvaluator implements DataSetEvaluator {
         .orderDesc("obv.personId,obv.obsDatetime") ;
 		List<Integer> personIds = evaluationService.evaluateToList(queryBuilder, Integer.class, context);
 		for (Integer personId : personIds) {
-			if(!uniqPatientsId.contains(personId))
+			if (!uniqPatientsId.contains(personId))
 				uniqPatientsId.add(personId);
 		}
 		return uniqPatientsId;
 	}
 	
-	private String getRegmin(Obs obs, EvaluationContext context) {
+	private String getRegimen(Obs obs, EvaluationContext context) {
 		HqlQueryBuilder queryBuilder = new HqlQueryBuilder();
 		
 		queryBuilder.select("obv.valueCoded").from(Obs.class, "obv")
