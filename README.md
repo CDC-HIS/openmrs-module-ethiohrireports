@@ -1,2 +1,2 @@
-# openmrs-module-ohri-reports
-OHRI Reporting module
+# openmrs-module-Ethiohri-reports
+EthiOHRI Reporting module
