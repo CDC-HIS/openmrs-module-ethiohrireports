@@ -62,6 +62,8 @@ public class OHRIReportsConstants {
 	public final static String CURRENTLY_BREAST_FEEDING_CHILD = "5632AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 	
 	public final static String YES = "1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+	public final static String NO = "1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+	public final static String UNKNOWN = "1067AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 	
 	/**
 	 * Associated Concepts
@@ -248,6 +250,9 @@ public class OHRIReportsConstants {
 	public final static String TB_SCREENING_DATE = "179497a0-6f07-469f-bb2e-9b85644a82af";
 	
 	public final static String TB_DIAGNOSTIC_TEST_RESULT = "c20140f7-d45d-4b44-a1b9-0534861a615d";
+
+	public final static String SPECIMEN_SENT = "161934AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+
 	
 	/**
 	 * Reports
@@ -276,7 +281,6 @@ public class OHRIReportsConstants {
 	public final static String SERVICE_DELIVERY_POINT_NUMBER_MRN = "162054AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 	
 	public final static String TB_TREATMENT_START_DATE = "1113AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-	public final static String TB_SCREENING_RESULT = "c20140f7-d45d-4b44-a1b9-0534861a615d";
 	
 	//TODO: update as soon as the concept created 
 	public final static String ADHERENCE_UUID = "";
