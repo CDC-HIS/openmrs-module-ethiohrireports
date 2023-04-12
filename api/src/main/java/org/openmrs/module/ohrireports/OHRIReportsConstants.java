@@ -274,6 +274,7 @@ public class OHRIReportsConstants {
 	public final static String SERVICE_DELIVERY_POINT_NUMBER_MRN = "162054AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 	
 	public final static String TB_TREATMENT_START_DATE = "1113AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+	public final static String TB_SCREENING_RESULT = "c20140f7-d45d-4b44-a1b9-0534861a615d";
 	
 	//TODO: update as soon as the concept created 
 	public final static String ADHERENCE_UUID = "";

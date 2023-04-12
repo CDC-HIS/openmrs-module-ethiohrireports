@@ -85,14 +85,17 @@ public class DatimTxTbDenominatorReport implements ReportManager {
 			map(sDefinition, "startDate=${startDateGC},endDate=${endDateGC}"));
 
 		TxTbDenominatorDiagnosticTestDataSetDefinition tDefinition = new TxTbDenominatorDiagnosticTestDataSetDefinition();
-		cDefinition.addParameters(getParameters());
-		cDefinition.setEncounterType(Context.getEncounterService().getEncounterTypeByUuid(HTS_FOLLOW_UP_ENCOUNTER_TYPE));
-		cDefinition.setDescription("Disaggregated by Specimen Sent and Diagnostic Test");
+		tDefinition.addParameters(getParameters());
+		tDefinition.setEncounterType(Context.getEncounterService().getEncounterTypeByUuid(HTS_FOLLOW_UP_ENCOUNTER_TYPE));
+		tDefinition.setDescription("Disaggregated by Specimen Sent and Diagnostic Test");
 		reportDefinition.addDataSetDefinition("Required : [Disagg by Specimen Sent] Diagnostic Test",
 			map(tDefinition, "startDate=${startDateGC},endDate=${endDateGC}"));
 		
 		TxTbDenominatorPositiveResultReturnedDataSetDefinition pDefinition = new TxTbDenominatorPositiveResultReturnedDataSetDefinition();
-		
+		pDefinition.addParameters(getParameters());
+		pDefinition.setEncounterType(Context.getEncounterService().getEncounterTypeByUuid(HTS_FOLLOW_UP_ENCOUNTER_TYPE));
+		pDefinition.setDescription("Disaggregated by Positive Result Returned");
+		reportDefinition.addDataSetDefinition("Required: Disaggregated by Positive Result Returned", map(pDefinition, "startDate=${startDateGC}, endDate=${endDateGC}"));
 		return reportDefinition;
 	}
 	
