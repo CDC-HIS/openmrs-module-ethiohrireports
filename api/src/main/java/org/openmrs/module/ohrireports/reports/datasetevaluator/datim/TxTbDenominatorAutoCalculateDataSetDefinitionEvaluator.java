@@ -9,10 +9,7 @@ import static org.openmrs.module.ohrireports.OHRIReportsConstants.ARV_DISPENSED_
 import static org.openmrs.module.ohrireports.OHRIReportsConstants.TB_TREATMENT_START_DATE;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-
-import org.openmrs.Concept;
 import org.openmrs.Obs;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.ConceptService;
@@ -117,9 +114,7 @@ public class TxTbDenominatorAutoCalculateDataSetDefinitionEvaluator implements D
                         {
                         patients.add(obs.getPersonId());
                         }
-        }
-		// patients = evaluationService.evaluateToList(queryBuilder, Integer.class, context);
-				
+        }			
 		return patients;
 	}
 	
