@@ -25,6 +25,9 @@ import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.openmrs.module.reporting.report.manager.ReportManager;
 import org.springframework.stereotype.Component;
 import static org.openmrs.module.ohrireports.OHRIReportsConstants.HTS_FOLLOW_UP_ENCOUNTER_TYPE;
+import static org.openmrs.module.ohrireports.OHRIReportsConstants.LINE_LIST_REPORT;
+
+;
 
 @Component
 public class TX_New_Report implements ReportManager {
@@ -36,7 +39,7 @@ public class TX_New_Report implements ReportManager {
 	
 	@Override
 	public String getName() {
-		return "TX New";
+		return LINE_LIST_REPORT + "-TX New";
 	}
 	
 	@Override

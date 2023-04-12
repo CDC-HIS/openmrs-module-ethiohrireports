@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import static org.openmrs.module.ohrireports.OHRIReportsConstants.HTS_FOLLOW_UP_ENCOUNTER_TYPE;
+import static org.openmrs.module.ohrireports.OHRIReportsConstants.DATIM_REPORT;
 
 import org.openmrs.EncounterType;
 import org.openmrs.api.context.Context;
@@ -35,7 +36,7 @@ public class DatimTxNewReport implements ReportManager {
 	
 	@Override
 	public String getName() {
-		return "DATIM-Tx-New";
+		return DATIM_REPORT + "-Tx-New";
 	}
 	
 	@Override
@@ -114,7 +115,7 @@ public class DatimTxNewReport implements ReportManager {
 	
 	@Override
 	public List<ReportDesign> constructReportDesigns(ReportDefinition reportDefinition) {
-		ReportDesign design = ReportManagerUtil.createExcelDesign("43cc0259-0c07-44c6-a4f5-0201fcb2d55d", reportDefinition);
+		ReportDesign design = ReportManagerUtil.createExcelDesign("8b70b3dd-0c07-44c6-a4f5-0201fcb2d55d", reportDefinition);
 		
 		return Arrays.asList(design);
 		

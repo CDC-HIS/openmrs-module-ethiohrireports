@@ -9,6 +9,8 @@
  */
 package org.openmrs.module.ohrireports;
 
+import org.apache.xmlbeans.impl.xb.xsdschema.Public;
+
 public class OHRIReportsConstants {
 	
 	/**
@@ -59,7 +61,7 @@ public class OHRIReportsConstants {
 	
 	public final static String CURRENTLY_BREAST_FEEDING_CHILD = "5632AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 	
-	public final static String BREAST_FEEDING_YES = "1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+	public final static String YES = "1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 	
 	/**
 	 * Associated Concepts
@@ -278,6 +280,14 @@ public class OHRIReportsConstants {
 	
 	//TODO: update as soon as the concept created 
 	public final static String ADHERENCE_UUID = "";
+	
 	//#endregion
 	
+	//#region Report Group 
+	public final static String DATIM_REPORT = "DATIM";
+	
+	public final static String HISM_REPORT = "HISM";
+	
+	public final static String LINE_LIST_REPORT = "LINELIST";
+	//#endregion
 }
