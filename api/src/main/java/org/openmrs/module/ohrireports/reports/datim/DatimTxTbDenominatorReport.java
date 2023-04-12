@@ -6,9 +6,11 @@ import java.util.List;
 import static org.openmrs.module.ohrireports.OHRIReportsConstants.HTS_FOLLOW_UP_ENCOUNTER_TYPE;
 
 import org.openmrs.api.context.Context;
-import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.TxTbNumeratorAutoCalculateDataSetDefinition;
-import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.TxTbNumeratorARTByAgeAndSexDataSetDefinition;
-
+import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.TxTbDenominatorAutoCalculateDataSetDefinition;
+import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.TxTbDenominatorARTByAgeAndSexDataSetDefinition;
+import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.TxTbDenominatorSpecimenSentDataSetDefinition;
+import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.TxTbDenominatorPositiveResultReturnedDataSetDefinition;
+import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.TxTbDenominatorDiagnosticTestDataSetDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.module.reporting.evaluation.parameter.Parameterizable;
@@ -25,7 +27,7 @@ public class DatimTxTbDenominatorReport implements ReportManager {
 	
 	@Override
 	public String getUuid() {
-		return "752txtbn-e57c-47d3-9dc3-57c4ad9e28bf";
+		return "752txtbd-e57c-47d3-9dc3-57c4ad9e28bf";
 	}
 	
 	@Override
@@ -59,21 +61,37 @@ public class DatimTxTbDenominatorReport implements ReportManager {
 		reportDefinition.setDescription(getDescription());
 		reportDefinition.setParameters(getParameters());
 		
-		TxTbNumeratorAutoCalculateDataSetDefinition aDefinition = new TxTbNumeratorAutoCalculateDataSetDefinition();
+		TxTbDenominatorAutoCalculateDataSetDefinition aDefinition = new TxTbDenominatorAutoCalculateDataSetDefinition();
 		aDefinition.addParameters(getParameters());
 		aDefinition.setEncounterType(Context.getEncounterService().getEncounterTypeByUuid(HTS_FOLLOW_UP_ENCOUNTER_TYPE));
 		aDefinition
-		        .setDescription("Number of adults and children currently enrolling ART and has documented Active on TB treatment");
+		        .setDescription("Number of ART patients who were screened for TB at least once during the reporting period. Denominator will auto-calculate from Start on ART by Screen Result by Age/Sex");
 		reportDefinition.addDataSetDefinition(
-		    "Auto-Calculate : Number of ART patients who were started on TB treatment during the reporting period",
+		    "Auto-Calculate : Number of ART patients who were screened for TB at least once during the reporting period. Denominator will auto-calculate from Start on ART by Screen Result by Age/Sex",
 		    map(aDefinition, "startDate=${startDateGC},endDate=${endDateGC}"));
 		
-		TxTbNumeratorARTByAgeAndSexDataSetDefinition cDefinition = new TxTbNumeratorARTByAgeAndSexDataSetDefinition();
+		TxTbDenominatorARTByAgeAndSexDataSetDefinition cDefinition = new TxTbDenominatorARTByAgeAndSexDataSetDefinition();
 		cDefinition.addParameters(getParameters());
 		cDefinition.setEncounterType(Context.getEncounterService().getEncounterTypeByUuid(HTS_FOLLOW_UP_ENCOUNTER_TYPE));
-		cDefinition.setDescription("Disaggregated by Current/New on ART by Age/Sex");
-		reportDefinition.addDataSetDefinition("Required : Disaggregated by Current/New on ART by Age/Sex",
+		cDefinition.setDescription("Disaggregated by Start of ART Screen Result by Age/Sex");
+		reportDefinition.addDataSetDefinition("Required : Disaggregated by Start of ART Screen Result by Age/Sex",
 		    map(cDefinition, "startDate=${startDateGC},endDate=${endDateGC}"));
+			
+		TxTbDenominatorSpecimenSentDataSetDefinition sDefinition = new TxTbDenominatorSpecimenSentDataSetDefinition();
+		sDefinition.addParameters(getParameters());
+		sDefinition.setEncounterType(Context.getEncounterService().getEncounterTypeByUuid(HTS_FOLLOW_UP_ENCOUNTER_TYPE));
+		sDefinition.setDescription("Disaggregated by Specimen Sent");
+		reportDefinition.addDataSetDefinition("Required : Disaggregated by Specimen Sent",
+			map(sDefinition, "startDate=${startDateGC},endDate=${endDateGC}"));
+
+		TxTbDenominatorDiagnosticTestDataSetDefinition tDefinition = new TxTbDenominatorDiagnosticTestDataSetDefinition();
+		cDefinition.addParameters(getParameters());
+		cDefinition.setEncounterType(Context.getEncounterService().getEncounterTypeByUuid(HTS_FOLLOW_UP_ENCOUNTER_TYPE));
+		cDefinition.setDescription("Disaggregated by Specimen Sent and Diagnostic Test");
+		reportDefinition.addDataSetDefinition("Required : [Disagg by Specimen Sent] Diagnostic Test",
+			map(tDefinition, "startDate=${startDateGC},endDate=${endDateGC}"));
+		
+		TxTbDenominatorPositiveResultReturnedDataSetDefinition pDefinition = new TxTbDenominatorPositiveResultReturnedDataSetDefinition();
 		
 		return reportDefinition;
 	}
@@ -90,7 +108,7 @@ public class DatimTxTbDenominatorReport implements ReportManager {
 	
 	@Override
 	public List<ReportDesign> constructReportDesigns(ReportDefinition reportDefinition) {
-		ReportDesign design = ReportManagerUtil.createExcelDesign("752txtbn-0c07-44c6-a4f5-0201fcb2d55d", reportDefinition);
+		ReportDesign design = ReportManagerUtil.createExcelDesign("752txtbd-0c07-44c6-a4f5-0201fcb2d55d", reportDefinition);
 		
 		return Arrays.asList(design);
 		
