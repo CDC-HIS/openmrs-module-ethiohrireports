@@ -1,4 +1,4 @@
-package org.openmrs.module.ohrireports.reports.datasetdefinition.datim;
+package org.openmrs.module.ohrireports.reports.datasetdefinition.datim.tb_art;
 
 import java.util.Date;
 
@@ -8,7 +8,7 @@ import org.openmrs.module.reporting.definition.configuration.ConfigurationProper
 import org.springframework.stereotype.Component;
 
 @Component
-public class TBARTAutoCalculateDataSetDefinition extends BaseDataSetDefinition {
+public class TBARTDataSetDefinition extends BaseDataSetDefinition {
 	
 	@ConfigurationProperty
 	private Date startDate;
@@ -19,16 +19,27 @@ public class TBARTAutoCalculateDataSetDefinition extends BaseDataSetDefinition {
 	@ConfigurationProperty
 	private EncounterType encounterType;
 	
-	@ConfigurationProperty
-	private boolean isNewlyEnrolled;
+	// @ConfigurationProperty
+	// private Boolean isNewlyEnrolled;
 	
-	public void setNewlyEnrolled(boolean isNewlyEnrolled) {
-		this.isNewlyEnrolled = isNewlyEnrolled;
-	}
+	// @ConfigurationProperty
+	// private String gender;
 	
-	public boolean getIsNewlyEnrolled() {
-		return false;
-	}
+	// public String getGender() {
+	// 	return gender;
+	// }
+	
+	// public void setGender(String gender) {
+	// 	this.gender = gender;
+	// }
+	
+	// public void setNewlyEnrolled(Boolean isNewlyEnrolled) {
+	// 	this.isNewlyEnrolled = isNewlyEnrolled;
+	// }
+	
+	// public Boolean getIsNewlyEnrolled() {
+	// 	return isNewlyEnrolled;
+	// }
 	
 	public Date getStartDate() {
 		return startDate;

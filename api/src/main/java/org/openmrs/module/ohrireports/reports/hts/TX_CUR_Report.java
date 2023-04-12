@@ -32,6 +32,9 @@ import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.openmrs.module.reporting.report.manager.ReportManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import static org.openmrs.module.ohrireports.OHRIReportsConstants.LINE_LIST_REPORT;
+
+;
 
 @Component
 public class TX_CUR_Report implements ReportManager {
@@ -55,7 +58,7 @@ public class TX_CUR_Report implements ReportManager {
 	
 	@Override
 	public String getName() {
-		return "TX CURR";
+		return LINE_LIST_REPORT + "-TX CURR";
 	}
 	
 	@Override
