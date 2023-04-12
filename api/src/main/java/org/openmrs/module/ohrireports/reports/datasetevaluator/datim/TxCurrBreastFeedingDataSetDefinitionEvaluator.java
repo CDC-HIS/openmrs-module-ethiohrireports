@@ -1,7 +1,7 @@
 package org.openmrs.module.ohrireports.reports.datasetevaluator.datim;
 
 import static org.openmrs.module.ohrireports.OHRIReportsConstants.CURRENTLY_BREAST_FEEDING_CHILD;
-import static org.openmrs.module.ohrireports.OHRIReportsConstants.BREAST_FEEDING_YES;
+import static org.openmrs.module.ohrireports.OHRIReportsConstants.YES;
 import static org.openmrs.module.ohrireports.OHRIReportsConstants.ALIVE;
 import static org.openmrs.module.ohrireports.OHRIReportsConstants.PATIENT_STATUS;
 import static org.openmrs.module.ohrireports.OHRIReportsConstants.RESTART;
@@ -52,7 +52,7 @@ public class TxCurrBreastFeedingDataSetDefinitionEvaluator implements DataSetEva
 		hdsd = (TxCurrBreastFeedingStatusDataSetDefinition) dataSetDefinition;
 		context = evalContext;
 		breastFeeding = conceptService.getConceptByUuid(CURRENTLY_BREAST_FEEDING_CHILD);
-		breastFeedingYes = conceptService.getConceptByUuid(BREAST_FEEDING_YES);
+		breastFeedingYes = conceptService.getConceptByUuid(YES);
 		DataSetRow dataSet = new DataSetRow();
 		dataSet.addColumnValue(new DataSetColumn("breastFeeding", "BreastFeeding", Integer.class),
 		    getNumberOfEnrolledBreastFeeding());

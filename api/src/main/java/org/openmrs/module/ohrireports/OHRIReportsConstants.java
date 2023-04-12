@@ -61,7 +61,7 @@ public class OHRIReportsConstants {
 	
 	public final static String CURRENTLY_BREAST_FEEDING_CHILD = "5632AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 	
-	public final static String BREAST_FEEDING_YES = "1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+	public final static String YES = "1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 	
 	/**
 	 * Associated Concepts
