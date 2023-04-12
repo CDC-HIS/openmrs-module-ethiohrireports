@@ -99,7 +99,7 @@ public class TBARTAutoCalculateDataSetDefinitionEvaluator implements DataSetEval
         HqlQueryBuilder queryBuilder = new HqlQueryBuilder();
         queryBuilder.select("distinct obs.personId").from(Obs.class, "obs")
                 .whereEqual("obs.encounter.encounterType", hdsd.getEncounterType()).and()
-                .whereEqual("obs.concept", TREATMENT_END_DATE).and()
+                .whereEqual("obs.concept", treatmentConcept).and()
                 .whereGreater("obs.valueDatetime", hdsd.getStartDate());
         return evaluationService.evaluateToList(queryBuilder, Integer.class, context);
     }

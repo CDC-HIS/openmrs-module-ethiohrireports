@@ -26,6 +26,9 @@ import org.openmrs.module.reporting.report.manager.ReportManager;
 import org.openmrs.module.reporting.report.manager.ReportManagerUtil;
 import org.springframework.stereotype.Component;
 import static org.openmrs.module.ohrireports.OHRIReportsConstants.HTS_FOLLOW_UP_ENCOUNTER_TYPE;
+import static org.openmrs.module.ohrireports.OHRIReportsConstants.LINE_LIST_REPORT;
+
+;
 
 @Component
 public class TransferInOutReport implements ReportManager {
@@ -37,7 +40,7 @@ public class TransferInOutReport implements ReportManager {
 	
 	@Override
 	public String getName() {
-		return "Transferred In/Out";
+		return LINE_LIST_REPORT + "-Transferred In/Out";
 	}
 	
 	@Override

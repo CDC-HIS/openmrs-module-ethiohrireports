@@ -74,14 +74,14 @@ public class TBARTNumeratorReport implements ReportManager {
 		TBARTDataSetDefinition alreadyOnARTSetDefinition = new TBARTDataSetDefinition();
 		alreadyOnARTSetDefinition.addParameters(getParameters());
 		alreadyOnARTSetDefinition.setEncounterType(followUpEncounter);
-		alreadyOnARTSetDefinition.setNewlyEnrolled(false);
-		reportDefinition.addDataSetDefinition("Disaggregated by Age/Sex/Result Already on ARt",
+		//alreadyOnARTSetDefinition.setNewlyEnrolled(false);
+		reportDefinition.addDataSetDefinition("Disaggregated by Age/Sex/Result Already on ART",
 		    map(alreadyOnARTSetDefinition, "startDate=${startDateGC},endDate=${endDateGC}"));
 		
 		TBARTDataSetDefinition newlyEnrolledSetDefinition = new TBARTDataSetDefinition();
 		newlyEnrolledSetDefinition.addParameters(getParameters());
 		newlyEnrolledSetDefinition.setEncounterType(followUpEncounter);
-		newlyEnrolledSetDefinition.setNewlyEnrolled(false);
+		//newlyEnrolledSetDefinition.setNewlyEnrolled(true);
 		reportDefinition.addDataSetDefinition("Disaggregated by Age/Sex/Result Newly on ARt",
 		    map(newlyEnrolledSetDefinition, "startDate=${startDateGC},endDate=${endDateGC}"));
 		

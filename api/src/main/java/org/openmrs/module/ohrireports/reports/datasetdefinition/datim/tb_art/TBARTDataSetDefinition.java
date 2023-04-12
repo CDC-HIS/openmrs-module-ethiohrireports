@@ -19,27 +19,27 @@ public class TBARTDataSetDefinition extends BaseDataSetDefinition {
 	@ConfigurationProperty
 	private EncounterType encounterType;
 	
-	@ConfigurationProperty
-	private boolean isNewlyEnrolled;
+	// @ConfigurationProperty
+	// private Boolean isNewlyEnrolled;
 	
-	@ConfigurationProperty
-	private String gender;
+	// @ConfigurationProperty
+	// private String gender;
 	
-	public String getGender() {
-		return gender;
-	}
+	// public String getGender() {
+	// 	return gender;
+	// }
 	
-	public void setGender(String gender) {
-		this.gender = gender;
-	}
+	// public void setGender(String gender) {
+	// 	this.gender = gender;
+	// }
 	
-	public void setNewlyEnrolled(boolean isNewlyEnrolled) {
-		this.isNewlyEnrolled = isNewlyEnrolled;
-	}
+	// public void setNewlyEnrolled(Boolean isNewlyEnrolled) {
+	// 	this.isNewlyEnrolled = isNewlyEnrolled;
+	// }
 	
-	public boolean getIsNewlyEnrolled() {
-		return false;
-	}
+	// public Boolean getIsNewlyEnrolled() {
+	// 	return isNewlyEnrolled;
+	// }
 	
 	public Date getStartDate() {
 		return startDate;

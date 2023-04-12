@@ -277,6 +277,14 @@ public class OHRIReportsConstants {
 	
 	//TODO: update as soon as the concept created 
 	public final static String ADHERENCE_UUID = "";
+	
 	//#endregion
 	
+	//#region Report Group 
+	public final static String DATIM_REPORT = "DATIM";
+	
+	public final static String HISM_REPORT = "HISM";
+	
+	public final static String LINE_LIST_REPORT = "LINELIST";
+	//#endregion
 }

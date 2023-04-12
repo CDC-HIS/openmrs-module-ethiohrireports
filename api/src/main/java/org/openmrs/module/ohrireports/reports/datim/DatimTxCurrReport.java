@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import static org.openmrs.module.ohrireports.OHRIReportsConstants.HTS_FOLLOW_UP_ENCOUNTER_TYPE;
+import static org.openmrs.module.ohrireports.OHRIReportsConstants.DATIM_REPORT;
 
 import org.openmrs.api.context.Context;
 import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.TxCurrAutoCalculateDataSetDefinition;
@@ -32,7 +33,7 @@ public class DatimTxCurrReport implements ReportManager {
 	
 	@Override
 	public String getName() {
-		return "DATIM-Tx-Curr";
+		return DATIM_REPORT + "-Tx-Curr";
 	}
 	
 	@Override

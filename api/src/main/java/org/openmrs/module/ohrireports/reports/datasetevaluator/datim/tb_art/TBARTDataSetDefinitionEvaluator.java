@@ -10,6 +10,7 @@ import static org.openmrs.module.ohrireports.OHRIReportsConstants.TREATMENT_END_
 import static org.openmrs.module.ohrireports.OHRIReportsConstants.TB_SCREENING_DATE;
 import static org.openmrs.module.ohrireports.OHRIReportsConstants.POSITIVE;
 
+import org.joda.time.chrono.IslamicChronology;
 import org.openmrs.Concept;
 import org.openmrs.Obs;
 import org.openmrs.annotation.Handler;
@@ -51,19 +52,23 @@ public class TBARTDataSetDefinitionEvaluator implements DataSetEvaluator {
         hdsd = (TBARTDataSetDefinition) dataSetDefinition;
         context = evalContext;
         setRequiredConcepts();
-        setObservations("F");
         SimpleDataSet simpleDataSet = new SimpleDataSet(dataSetDefinition, evalContext);
+        buildDataSet(simpleDataSet, true);
+
+        return simpleDataSet;
+
+    }
+
+    private void buildDataSet(SimpleDataSet simpleDataSet, boolean isAlreadyOnArt) {
+        setObservations("F",isAlreadyOnArt);
         DataSetRow femaleSetRow = new DataSetRow();
         buildDataSet(femaleSetRow, "F");
         simpleDataSet.addRow(femaleSetRow);
 
-        setObservations("M");
+        setObservations("M",isAlreadyOnArt);
         DataSetRow maleSetRow = new DataSetRow();
         buildDataSet(maleSetRow, "M");
         simpleDataSet.addRow(maleSetRow);
-
-        return simpleDataSet;
-
     }
 
     private void buildDataSet(DataSetRow dataSet, String gender) {
@@ -168,19 +173,20 @@ public class TBARTDataSetDefinitionEvaluator implements DataSetEvaluator {
         positiveConcept = conceptService.getConceptByUuid(POSITIVE);
     }
 
-    private void setObservations(String gender) {
+    private void setObservations(String gender,boolean isAlreadyOnArt) {
         HqlQueryBuilder queryBuilder = new HqlQueryBuilder();
         queryBuilder.select("obs").from(Obs.class, "obs")
                 .whereEqual("obs.encounter.encounterType", hdsd.getEncounterType())
                 .and()
                 .whereEqual("obs.person.gender", gender)
                 .whereEqual("obs.concept", artConcept).and();
-        if (hdsd.getIsNewlyEnrolled()) {
-            queryBuilder.whereBetweenInclusive("obs.valueDatetime", hdsd.getStartDate(), hdsd.getEndDate());
+            if (!isAlreadyOnArt) {
+            queryBuilder.whereBetweenInclusive("obs.valueDatetime", hdsd.getStartDate(),
+             hdsd.getEndDate());
 
-        } else {
-            queryBuilder.whereLess("obs.valueDatetime", hdsd.getStartDate());
-        }
+            }else {
+                queryBuilder.whereLess("obs.valueDatetime", hdsd.getStartDate());
+            }
 
         queryBuilder.whereIdIn("obs.personId", getPatientsWithTB());
 
@@ -192,7 +198,7 @@ public class TBARTDataSetDefinitionEvaluator implements DataSetEvaluator {
         HqlQueryBuilder queryBuilder = new HqlQueryBuilder();
         queryBuilder.select("distinct obs.personId").from(Obs.class, "obs")
                 .whereEqual("obs.encounter.encounterType", hdsd.getEncounterType()).and()
-                .whereEqual("obs.concept", TREATMENT_END_DATE).and()
+                .whereEqual("obs.concept", treatmentConcept).and()
                 .whereGreater("obs.valueDatetime", hdsd.getStartDate());
         return evaluationService.evaluateToList(queryBuilder, Integer.class, context);
     }
@@ -201,8 +207,8 @@ public class TBARTDataSetDefinitionEvaluator implements DataSetEvaluator {
         HqlQueryBuilder queryBuilder = new HqlQueryBuilder();
         queryBuilder.select("obs").from(Obs.class, "obs")
                 .whereEqual("obs.encounter.encounterType", hdsd.getEncounterType())
-                .and().whereEqual("obs.concept", TB_DIAGNOSTIC_TEST_RESULT).and()
-                .whereEqual("obs.valueCoded", POSITIVE)
+                .and().whereEqual("obs.concept", tbDiagnosticTestResultConcept).and()
+                .whereEqual("obs.valueCoded", positiveConcept)
                 .and().whereIdIn("obs.personId", getOnTreatmentPatients());
         return evaluationService.evaluateToList(queryBuilder, Integer.class, context);
 
