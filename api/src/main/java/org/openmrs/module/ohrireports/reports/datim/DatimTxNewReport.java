@@ -115,7 +115,7 @@ public class DatimTxNewReport implements ReportManager {
 	
 	@Override
 	public List<ReportDesign> constructReportDesigns(ReportDefinition reportDefinition) {
-		ReportDesign design = ReportManagerUtil.createExcelDesign("43cc0259-0c07-44c6-a4f5-0201fcb2d55d", reportDefinition);
+		ReportDesign design = ReportManagerUtil.createExcelDesign("8b70b3dd-0c07-44c6-a4f5-0201fcb2d55d", reportDefinition);
 		
 		return Arrays.asList(design);
 		
