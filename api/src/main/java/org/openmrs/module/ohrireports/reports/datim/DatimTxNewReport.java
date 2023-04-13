@@ -36,7 +36,7 @@ public class DatimTxNewReport implements ReportManager {
 	
 	@Override
 	public String getName() {
-		return DATIM_REPORT + "-Tx-New";
+		return DATIM_REPORT + "-Tx_New";
 	}
 	
 	@Override
