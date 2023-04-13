@@ -5,14 +5,14 @@ import static org.openmrs.module.ohrireports.OHRIReportsConstants.PATIENT_STATUS
 import static org.openmrs.module.ohrireports.OHRIReportsConstants.RESTART;
 import static org.openmrs.module.ohrireports.OHRIReportsConstants.TREATMENT_END_DATE;
 import static org.openmrs.module.ohrireports.OHRIReportsConstants.ARV_DISPENSED_IN_DAYS;
-import static org.openmrs.module.ohrireports.OHRIReportsConstants.TB_SCREENING_DATE;
+import static org.openmrs.module.ohrireports.OHRIReportsConstants.TB_TREATMENT_START_DATE;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.openmrs.Obs;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.ConceptService;
-import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.TxTbDenominatorAutoCalculateDataSetDefinition;
+import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.TxTbDenominatorSpecimenSentDataSetDefinition;
 import org.openmrs.module.reporting.dataset.DataSet;
 import org.openmrs.module.reporting.dataset.DataSetColumn;
 import org.openmrs.module.reporting.dataset.DataSetRow;
@@ -25,12 +25,12 @@ import org.openmrs.module.reporting.evaluation.querybuilder.HqlQueryBuilder;
 import org.openmrs.module.reporting.evaluation.service.EvaluationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
-@Handler(supports = { TxTbDenominatorAutoCalculateDataSetDefinition.class })
-public class TxTbDenominatorAutoCalculateDataSetDefinitionEvaluator implements DataSetEvaluator {
+@Handler(supports = { TxTbDenominatorSpecimenSentDataSetDefinition.class })
+public class TxTbDenominatorSpecimenSentDataSetDefinitionEvaluator implements DataSetEvaluator {
 	
 	private EvaluationContext context;
 	
-	private TxTbDenominatorAutoCalculateDataSetDefinition hdsd;
+	private TxTbDenominatorSpecimenSentDataSetDefinition hdsd;
 	
 	// HashMap<Integer, Concept> patientStatus = new HashMap<>();
 	private String title = "Number of ART patients who were started on TB treatment during the reporting period";
@@ -44,33 +44,33 @@ public class TxTbDenominatorAutoCalculateDataSetDefinitionEvaluator implements D
 	@Override
 	public DataSet evaluate(DataSetDefinition dataSetDefinition, EvaluationContext evalContext) throws EvaluationException {
 		
-		hdsd = (TxTbDenominatorAutoCalculateDataSetDefinition) dataSetDefinition;
+		hdsd = (TxTbDenominatorSpecimenSentDataSetDefinition) dataSetDefinition;
 		context = evalContext;
 		
 		DataSetRow dataSet = new DataSetRow();
 		dataSet.addColumnValue(new DataSetColumn("adultAndChildrenEnrolled", "Numerator", Integer.class),
-		    getTBscreenedInReportingPeriod());
+		    getTBstartedInReportingPeriod());
 		SimpleDataSet set = new SimpleDataSet(dataSetDefinition, evalContext);
 		set.addRow(dataSet);
 		return set;
 	}
 	
-	public int getTBscreenedInReportingPeriod(){
-		List<Integer> tbscreened = new ArrayList<>();
+	public int getTBstartedInReportingPeriod(){
+		List<Integer> tbstarted = new ArrayList<>();
 		List<Obs> obstbstarted = new ArrayList<>();
 		List<Integer> dispense = getDispenseDose();
 		if (dispense == null || dispense.size()==0){
-			return tbscreened.size();
+			return tbstarted.size();
 		}
 		HqlQueryBuilder queryBuilder = new HqlQueryBuilder();
-		queryBuilder.select("obs").from(Obs.class,"obs").whereEqual("obs.concept", conceptService.getConceptByUuid(TB_SCREENING_DATE)).and().whereGreater("obs.valueDatetime", hdsd.getStartDate()).and().whereLess("obs.valueDatetime",hdsd.getEndDate()).orderDesc("obs.personId, obs.obsDatetime");
+		queryBuilder.select("obs").from(Obs.class,"obs").whereEqual("obs.concept", conceptService.getConceptByUuid(TB_TREATMENT_START_DATE)).and().whereGreater("obs.valueDatetime", hdsd.getStartDate()).and().whereLess("obs.valueDatetime",hdsd.getEndDate()).orderDesc("obs.personId, obs.obsDatetime");
 		obstbstarted=evaluationService.evaluateToList(queryBuilder,Obs.class,context);
 		for (Obs obs:obstbstarted){
-			if (!tbscreened.contains(obs.getPersonId())){
-				tbscreened.add(obs.getPersonId());
+			if (!tbstarted.contains(obs.getPersonId())){
+				tbstarted.add(obs.getPersonId());
 			}
 		}
-		return tbscreened.size();
+		return tbstarted.size();
 	}
 	
 	public List<Integer> getDispenseDose() {
