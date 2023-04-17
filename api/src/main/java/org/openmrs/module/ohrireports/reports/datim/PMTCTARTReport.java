@@ -8,6 +8,7 @@ import static org.openmrs.module.ohrireports.OHRIReportsConstants.*;
 
 import org.openmrs.EncounterType;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.pmtct_art.PMTCTARTAutoCalculateDataSetDefinition;
 import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.tb_art.TBARTAutoCalculateDataSetDefinition;
 import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.tb_art.PMTCTARTDataSetDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
@@ -22,23 +23,23 @@ import org.openmrs.module.reporting.report.manager.ReportManagerUtil;
 import org.springframework.stereotype.Component;
 
 @Component
-public class TBARTNumeratorReport implements ReportManager {
+public class PMTCTARTReport implements ReportManager {
 	
 	private EncounterType followUpEncounter;
 	
 	@Override
 	public String getUuid() {
-		return "af7c1fe6-d669-414e-b066-e9733f0de7a8";
+		return "59182764-c3a4-41bf-84ad-855d0804f89b";
 	}
 	
 	@Override
 	public String getName() {
-		return DATIM_REPORT + "-TB_ART (Numerator)";
+		return DATIM_REPORT + "-PMTCT_ART";
 	}
 	
 	@Override
 	public String getDescription() {
-		return "Proportion of HIV-positive new and relapsed TB cases on ART during TB treatment";
+		return "Number of HIV-positive pregnant women who received ART to reduce the risk of mother-to-child-transmission";
 	}
 	
 	@Override
@@ -64,26 +65,25 @@ public class TBARTNumeratorReport implements ReportManager {
 		reportDefinition.setParameters(getParameters());
 		followUpEncounter = Context.getEncounterService().getEncounterTypeByUuid(HTS_FOLLOW_UP_ENCOUNTER_TYPE);
 		
-		TBARTAutoCalculateDataSetDefinition tbADataSet = new TBARTAutoCalculateDataSetDefinition();
+		PMTCTARTAutoCalculateDataSetDefinition tbADataSet = new PMTCTARTAutoCalculateDataSetDefinition();
 		tbADataSet.addParameters(getParameters());
 		tbADataSet.setEncounterType(followUpEncounter);
 		reportDefinition
 		        .addDataSetDefinition(
-		            "Number of TB cases with documented HIV-positive status who start or continue ART during the reporting period. ",
+		            "During pregnancy.Numerator will auto-calculate from the Maternal Regimen Type Desegregates",
 		            map(tbADataSet, "startDate=${startDateGC},endDate=${endDateGC}"));
 		
 		PMTCTARTDataSetDefinition alreadyOnARTSetDefinition = new PMTCTARTDataSetDefinition();
 		alreadyOnARTSetDefinition.addParameters(getParameters());
 		alreadyOnARTSetDefinition.setEncounterType(followUpEncounter);
-		//alreadyOnARTSetDefinition.setNewlyEnrolled(false);
-		reportDefinition.addDataSetDefinition("Disaggregated by Age/Sex/Result Already on ART",
+		reportDefinition.addDataSetDefinition("Disaggregated by Regiment Type:",
 		    map(alreadyOnARTSetDefinition, "startDate=${startDateGC},endDate=${endDateGC}"));
 		
 		PMTCTARTDataSetDefinition newlyEnrolledSetDefinition = new PMTCTARTDataSetDefinition();
 		newlyEnrolledSetDefinition.addParameters(getParameters());
 		newlyEnrolledSetDefinition.setEncounterType(followUpEncounter);
 		//newlyEnrolledSetDefinition.setNewlyEnrolled(true);
-		reportDefinition.addDataSetDefinition("Disaggregated by Age/Sex/Result Newly on ARt",
+		reportDefinition.addDataSetDefinition("Disaggregated by Regiment Type:",
 		    map(newlyEnrolledSetDefinition, "startDate=${startDateGC},endDate=${endDateGC}"));
 		
 		return reportDefinition;
@@ -91,7 +91,7 @@ public class TBARTNumeratorReport implements ReportManager {
 	
 	@Override
 	public List<ReportDesign> constructReportDesigns(ReportDefinition reportDefinition) {
-		ReportDesign design = ReportManagerUtil.createExcelDesign("81fa27e6-4685-49e4-9e37-ae11e679f4d5", reportDefinition);
+		ReportDesign design = ReportManagerUtil.createExcelDesign("c3ef9586-cadd-4ce3-bc07-3e1ed79c994d", reportDefinition);
 		
 		return Arrays.asList(design);
 		

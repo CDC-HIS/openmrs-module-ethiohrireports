@@ -1,4 +1,4 @@
-package org.openmrs.module.ohrireports.reports.datasetevaluator.datim.tb_art;
+package org.openmrs.module.ohrireports.reports.datasetevaluator.datim.pmtct_art;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +29,7 @@ import org.openmrs.module.reporting.evaluation.service.EvaluationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Handler(supports = { PMTCTARTDataSetDefinition.class })
-public class TBARTDataSetDefinitionEvaluator implements DataSetEvaluator {
+public class PMTCTARTDataSetDefinitionEvaluator implements DataSetEvaluator {
 
     private EvaluationContext context;
     private int total = 0;
@@ -65,10 +65,6 @@ public class TBARTDataSetDefinitionEvaluator implements DataSetEvaluator {
         buildDataSet(femaleSetRow, "F");
         simpleDataSet.addRow(femaleSetRow);
 
-        setObservations("M",isAlreadyOnArt);
-        DataSetRow maleSetRow = new DataSetRow();
-        buildDataSet(maleSetRow, "M");
-        simpleDataSet.addRow(maleSetRow);
     }
 
     private void buildDataSet(DataSetRow dataSet, String gender) {
@@ -188,7 +184,7 @@ public class TBARTDataSetDefinitionEvaluator implements DataSetEvaluator {
                 queryBuilder.whereLess("obs.valueDatetime", hdsd.getStartDate());
             }
 
-        queryBuilder.whereIdIn("obs.personId", getPatientsWithTB());
+        queryBuilder.whereIdIn("obs.personId", getPregnantPatients());
 
         obses = evaluationService.evaluateToList(queryBuilder, Obs.class, context);
 
@@ -202,8 +198,10 @@ public class TBARTDataSetDefinitionEvaluator implements DataSetEvaluator {
                 .whereGreater("obs.valueDatetime", hdsd.getStartDate());
         return evaluationService.evaluateToList(queryBuilder, Integer.class, context);
     }
+    
 
-    private List<Integer> getPatientsWithTB() {
+    private List<Integer> getPregnantPatients() {
+        //TODO: update the query for the  pregnant patients
         HqlQueryBuilder queryBuilder = new HqlQueryBuilder();
         queryBuilder.select("obs").from(Obs.class, "obs")
                 .whereEqual("obs.encounter.encounterType", hdsd.getEncounterType())

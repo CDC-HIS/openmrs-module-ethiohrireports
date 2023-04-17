@@ -1,0 +1,68 @@
+package org.openmrs.module.ohrireports.reports.datasetdefinition.datim.tb_art;
+
+import java.util.Date;
+
+import org.openmrs.EncounterType;
+import org.openmrs.module.reporting.dataset.definition.BaseDataSetDefinition;
+import org.openmrs.module.reporting.definition.configuration.ConfigurationProperty;
+import org.springframework.stereotype.Component;
+
+@Component
+public class PMTCTARTDataSetDefinition extends BaseDataSetDefinition {
+	
+	@ConfigurationProperty
+	private Date startDate;
+	
+	@ConfigurationProperty
+	private Date endDate;
+	
+	@ConfigurationProperty
+	private EncounterType encounterType;
+	
+	// @ConfigurationProperty
+	// private Boolean isNewlyEnrolled;
+	
+	// @ConfigurationProperty
+	// private String gender;
+	
+	// public String getGender() {
+	// 	return gender;
+	// }
+	
+	// public void setGender(String gender) {
+	// 	this.gender = gender;
+	// }
+	
+	// public void setNewlyEnrolled(Boolean isNewlyEnrolled) {
+	// 	this.isNewlyEnrolled = isNewlyEnrolled;
+	// }
+	
+	// public Boolean getIsNewlyEnrolled() {
+	// 	return isNewlyEnrolled;
+	// }
+	
+	public Date getStartDate() {
+		return startDate;
+	}
+	
+	public void setStartDate(Date startDate) {
+		this.startDate = startDate;
+	}
+	
+	public Date getEndDate() {
+		return endDate;
+	}
+	
+	public void setEndDate(Date endDate) {
+		this.endDate = endDate;
+	}
+	
+	public EncounterType getEncounterType() {
+		return encounterType;
+	}
+	
+	public void setEncounterType(EncounterType encounterType) {
+		this.encounterType = encounterType;
+	}
+	
+}
