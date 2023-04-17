@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import static org.openmrs.module.ohrireports.OHRIReportsConstants.HTS_FOLLOW_UP_ENCOUNTER_TYPE;
+import static org.openmrs.module.ohrireports.OHRIReportsConstants.*;
 
 import org.openmrs.api.context.Context;
 import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.TxTbNumeratorAutoCalculateDataSetDefinition;
@@ -30,7 +31,7 @@ public class DatimTxTbNumeratorReport implements ReportManager {
 	
 	@Override
 	public String getName() {
-		return "DATIM-Tx-Tb-Numerator";
+		return DATIM_REPORT + "-Tx_Tb_Numerator";
 	}
 	
 	@Override

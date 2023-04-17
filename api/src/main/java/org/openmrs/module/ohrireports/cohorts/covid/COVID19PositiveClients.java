@@ -16,7 +16,7 @@ public class COVID19PositiveClients extends BaseCohortDefinitionManager {
 	
 	@Override
 	public String getUuid() {
-		return COVID19_POSITIVE_CLIENTS;
+		return "COVID19_POSITIVE_CLIENTS";
 	}
 	
 	@Override

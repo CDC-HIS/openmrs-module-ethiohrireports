@@ -58,7 +58,7 @@ public class TX_CUR_Report implements ReportManager {
 	
 	@Override
 	public String getName() {
-		return LINE_LIST_REPORT + "-TX CURR";
+		return LINE_LIST_REPORT + "-TX_CURR";
 	}
 	
 	@Override

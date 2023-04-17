@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import static org.openmrs.module.ohrireports.OHRIReportsConstants.HTS_FOLLOW_UP_ENCOUNTER_TYPE;
+import static org.openmrs.module.ohrireports.OHRIReportsConstants.*;
 
 import org.openmrs.EncounterType;
 import org.openmrs.api.context.Context;
@@ -32,7 +33,7 @@ public class TBARTNumeratorReport implements ReportManager {
 	
 	@Override
 	public String getName() {
-		return "TB_ART (Numerator)";
+		return DATIM_REPORT + "-TB_ART (Numerator)";
 	}
 	
 	@Override
