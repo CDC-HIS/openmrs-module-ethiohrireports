@@ -54,7 +54,8 @@ public class TBARTAutoCalculateDataSetDefinitionEvaluator implements DataSetEval
         setRequiredConcepts();
 
         DataSetRow dataSet = new DataSetRow();
-        dataSet.addColumnValue(new DataSetColumn("auto-calculate","Numerator", Integer.class), getTotalCount());
+        dataSet.addColumnValue(new DataSetColumn("auto-calculate","Numerator", Integer.class), 
+        getTotalCount());
         SimpleDataSet set = new SimpleDataSet(dataSetDefinition, evalContext);
         set.addRow(dataSet);
         return set;
