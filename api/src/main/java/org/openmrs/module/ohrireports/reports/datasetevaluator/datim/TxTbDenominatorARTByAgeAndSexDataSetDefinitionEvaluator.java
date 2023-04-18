@@ -39,10 +39,10 @@ public class TxTbDenominatorARTByAgeAndSexDataSetDefinitionEvaluator implements 
 	
 	private TxTbDenominatorARTByAgeAndSexDataSetDefinition hdsd;
 	private int total = 0;
-	private int malePtotal = 0;
-	private int femalePtotal = 0;
-	private int maleNtotal = 0;
-	private int femaleNtotal = 0;	
+	private int malePretotal = 0;
+	private int femalePretotal = 0;
+	private int maleNewtotal = 0;
+	private int femaleNewtotal = 0;	
 	// HashMap<Integer, Concept> patientStatus = new HashMap<>();
 	private String title = "Number of ART patients who were started on TB treatment during the reporting period";
 	
@@ -59,89 +59,81 @@ public class TxTbDenominatorARTByAgeAndSexDataSetDefinitionEvaluator implements 
 		hdsd = (TxTbDenominatorARTByAgeAndSexDataSetDefinition) dataSetDefinition;
 		context = evalContext;
 		total=0;
-		malePtotal = 0;
-		femalePtotal = 0;
-		maleNtotal = 0;
-		femaleNtotal = 0;
+		malePretotal = 0;
+		femalePretotal = 0;
+		maleNewtotal = 0;
+		femaleNewtotal = 0;
 		SimpleDataSet set = new SimpleDataSet(dataSetDefinition, evalContext);
-
-		DataSetRow newARTstartedP = new DataSetRow();
+		DataSetRow allPositive = new DataSetRow();
 		obses = getARTstarted("F","p");
-		femalePtotal+=obses.size();
-		newARTstartedP.addColumnValue(new DataSetColumn("", "", String.class),
-        "The number of patients starting TB treatment who newly started ART during the reporting period (POSITIVE)");
-		newARTstartedP.addColumnValue(new DataSetColumn("funknownAge", "Female Unknown Age", Integer.class),
+		femaleNewtotal+=obses.size();
+		allPositive.addColumnValue(new DataSetColumn("", "", String.class),
+        "POSITIVE");
+		allPositive.addColumnValue(new DataSetColumn("funknownAgeN", "Newly enrolled on ART Female Unknown Age", Integer.class),
         getUnknownAgeByGender());
-		newARTstartedP.addColumnValue(new DataSetColumn("f<15", "Female <15", Integer.class),getEnrolledByAgeAndGender(0, 14));
-		newARTstartedP.addColumnValue(new DataSetColumn("f+15", "female +15", Integer.class),getEnrolledByAgeAndGender(15, 150));
+		allPositive.addColumnValue(new DataSetColumn("f<15N", "Newly enrolled on ART Female <15", Integer.class),getEnrolledByAgeAndGender(0, 14));
+		allPositive.addColumnValue(new DataSetColumn("f+15N", "Newly enrolled on ART Female +15", Integer.class),getEnrolledByAgeAndGender(15, 150));
 		obses = getARTstarted("M","p");
-		malePtotal+=obses.size();
-		newARTstartedP.addColumnValue(new DataSetColumn("munknownAge", "Male Unknown Age", Integer.class),
+		maleNewtotal+=obses.size();
+		allPositive.addColumnValue(new DataSetColumn("munknownAgeN", "Newly enrolled on ART Male Unknown Age", Integer.class),
         getUnknownAgeByGender());
-		newARTstartedP.addColumnValue(new DataSetColumn("m<15", "Male <15", Integer.class),getEnrolledByAgeAndGender(0, 14));
-		newARTstartedP.addColumnValue(new DataSetColumn("m+15", "Male +15", Integer.class),getEnrolledByAgeAndGender(15, 150));
-		set.addRow(newARTstartedP);
+		allPositive.addColumnValue(new DataSetColumn("m<15N", "Newly enrolled on ART Male <15", Integer.class),getEnrolledByAgeAndGender(0, 14));
+		allPositive.addColumnValue(new DataSetColumn("m+15N", "Newly enrolled on ART Male +15", Integer.class),getEnrolledByAgeAndGender(15, 150));
 
-		DataSetRow newARTstartedN = new DataSetRow();
-		obses = getARTstarted("F","n");
-		femaleNtotal+=obses.size();
-		newARTstartedN.addColumnValue(new DataSetColumn("", "", String.class),
-        "The number of patients starting TB treatment who newly started ART during the reporting period (NEGATIVE)");
-		newARTstartedN.addColumnValue(new DataSetColumn("funknownAge", "Female Unknown Age", Integer.class),
-        getUnknownAgeByGender());
-		newARTstartedN.addColumnValue(new DataSetColumn("f<15", "Female <15", Integer.class),getEnrolledByAgeAndGender(0, 14));
-		newARTstartedN.addColumnValue(new DataSetColumn("f+15", "female +15", Integer.class),getEnrolledByAgeAndGender(15, 150));
-		obses = getARTstarted("M","n");
-		maleNtotal+=obses.size();
-		newARTstartedN.addColumnValue(new DataSetColumn("munknownAge", "Male Unknown Age", Integer.class),
-        getUnknownAgeByGender());
-		newARTstartedN.addColumnValue(new DataSetColumn("m<15", "Male <15", Integer.class),getEnrolledByAgeAndGender(0, 14));
-		newARTstartedN.addColumnValue(new DataSetColumn("m+15", "Male +15", Integer.class),getEnrolledByAgeAndGender(15, 150));
-		set.addRow(newARTstartedN);
-
-		DataSetRow oldARTstartedP = new DataSetRow();
 		obses = getPreviouslyOnART("F","p");
-		femalePtotal+=obses.size();
-		oldARTstartedP.addColumnValue(new DataSetColumn("", "", String.class),
-        "The number of patients starting TB treatment who were already on ART prior to the start of the reporting period (POSITIVE)");
-		oldARTstartedP.addColumnValue(new DataSetColumn("funkownAge", "Female Unknown Age", Integer.class),
+		femalePretotal+=obses.size();
+		allPositive.addColumnValue(new DataSetColumn("funknownAgeP", "Previously Enrolled on ART Female Unknown Age", Integer.class),
         getUnknownAgeByGender());
-		oldARTstartedP.addColumnValue(new DataSetColumn("f<15", "Female <15", Integer.class),getEnrolledByAgeAndGender(0, 14));
-		oldARTstartedP.addColumnValue(new DataSetColumn("f+15", "female +15", Integer.class),getEnrolledByAgeAndGender(15, 150));
+		allPositive.addColumnValue(new DataSetColumn("f<15P", "Previously Enrolled on ART Female <15", Integer.class),getEnrolledByAgeAndGender(0, 14));
+		allPositive.addColumnValue(new DataSetColumn("f+15P", "Previously Enrolled on ART Female +15", Integer.class),getEnrolledByAgeAndGender(15, 150));
 
 		obses = getPreviouslyOnART("M","p");
-		malePtotal+=obses.size();
-		oldARTstartedP.addColumnValue(new DataSetColumn("munknownAge", "Male Unknown Age", Integer.class),
+		malePretotal+=obses.size();
+		allPositive.addColumnValue(new DataSetColumn("munknownAgeP", "Previously Enrolled on ART Male Unknown Age", Integer.class),
         getUnknownAgeByGender());
-		oldARTstartedP.addColumnValue(new DataSetColumn("m<15", "Male <15", Integer.class),getEnrolledByAgeAndGender(0, 14));
-		oldARTstartedP.addColumnValue(new DataSetColumn("m+15", "Male +15", Integer.class),getEnrolledByAgeAndGender(15, 150));
-		set.addRow(oldARTstartedP);
+		allPositive.addColumnValue(new DataSetColumn("m<15P", "Previously Enrolled on ART Male <15", Integer.class),getEnrolledByAgeAndGender(0, 14));
+		allPositive.addColumnValue(new DataSetColumn("m+15P", "Previously Enrolled on ART Male +15", Integer.class),getEnrolledByAgeAndGender(15, 150));
+		set.addRow(allPositive);
 
-		DataSetRow oldARTstartedN = new DataSetRow();
-		obses = getPreviouslyOnART("F","n");
-		femaleNtotal+=obses.size();
-		oldARTstartedN.addColumnValue(new DataSetColumn("", "", String.class),
-        "The number of patients starting TB treatment who were already on ART prior to the start of the reporting period (NEGATIVE)");
-		oldARTstartedN.addColumnValue(new DataSetColumn("funkownAge", "Female Unknown Age", Integer.class),
+		DataSetRow allNegative = new DataSetRow();
+		obses = getARTstarted("F","n");
+		femaleNewtotal+=obses.size();
+		allNegative.addColumnValue(new DataSetColumn("", "", String.class),
+        "NEGATIVE");
+		allNegative.addColumnValue(new DataSetColumn("funknownAgeN", "Newly enrolled on ART Female Unknown Age", Integer.class),
         getUnknownAgeByGender());
-		oldARTstartedN.addColumnValue(new DataSetColumn("f<15", "Female <15", Integer.class),getEnrolledByAgeAndGender(0, 14));
-		oldARTstartedN.addColumnValue(new DataSetColumn("f+15", "female +15", Integer.class),getEnrolledByAgeAndGender(15, 150));
+		allNegative.addColumnValue(new DataSetColumn("f<15N", "Newly enrolled on ART Female <15", Integer.class),getEnrolledByAgeAndGender(0, 14));
+		allNegative.addColumnValue(new DataSetColumn("f+15N", "Newly enrolled on ART Female +15", Integer.class),getEnrolledByAgeAndGender(15, 150));
+		
+		obses = getARTstarted("M","n");
+		maleNewtotal+=obses.size();
+		allNegative.addColumnValue(new DataSetColumn("munknownAgeN", "Newly enrolled on ART Male Unknown Age", Integer.class),
+        getUnknownAgeByGender());
+		allNegative.addColumnValue(new DataSetColumn("m<15N", "Newly enrolled on ART Male <15", Integer.class),getEnrolledByAgeAndGender(0, 14));
+		allNegative.addColumnValue(new DataSetColumn("m+15N", "Newly enrolled on ART Male +15", Integer.class),getEnrolledByAgeAndGender(15, 150));
+
+		obses = getPreviouslyOnART("F","n");
+		femalePretotal+=obses.size();
+		allNegative.addColumnValue(new DataSetColumn("funknownAgeP", "Previously Enrolled on ART Female Unknown Age", Integer.class),
+        getUnknownAgeByGender());
+		allNegative.addColumnValue(new DataSetColumn("f<15P", "Previously Enrolled on ART Female <15", Integer.class),getEnrolledByAgeAndGender(0, 14));
+		allNegative.addColumnValue(new DataSetColumn("f+15P", "Previously Enrolled on ART Female +15", Integer.class),getEnrolledByAgeAndGender(15, 150));
 
 		obses = getPreviouslyOnART("M","n");
-		maleNtotal+=obses.size();
-		oldARTstartedN.addColumnValue(new DataSetColumn("munknownAge", "Male Unknown Age", Integer.class),
+		malePretotal+=obses.size();
+		allNegative.addColumnValue(new DataSetColumn("munknownAgeP", "Previously Enrolled on ART Male Unknown Age", Integer.class),
         getUnknownAgeByGender());
-		oldARTstartedN.addColumnValue(new DataSetColumn("m<15", "Male <15", Integer.class),getEnrolledByAgeAndGender(0, 14));
-		oldARTstartedN.addColumnValue(new DataSetColumn("m+15", "Male +15", Integer.class),getEnrolledByAgeAndGender(15, 150));
-		set.addRow(oldARTstartedN);
-
+		allNegative.addColumnValue(new DataSetColumn("m<15P", "Previously Enrolled on ART Male <15", Integer.class),getEnrolledByAgeAndGender(0, 14));
+		allNegative.addColumnValue(new DataSetColumn("m+15P", "Previously Enrolled on ART Male +15", Integer.class),getEnrolledByAgeAndGender(15, 150));
+		set.addRow(allNegative);
+	
         DataSetRow tSetRow = new DataSetRow();
-		tSetRow.addColumnValue(new DataSetColumn("funknownAge", "feSub-Total", Integer.class),
-                femalePtotal);
-		tSetRow.addColumnValue(new DataSetColumn("munknownAge", "maleSub-Total", Integer.class),
-                malePtotal);
-        tSetRow.addColumnValue(new DataSetColumn("subtotal", "Sub-Total", Integer.class),
-                total);
+		tSetRow.addColumnValue(new DataSetColumn("", "", String.class),
+                "Sub-total");
+		tSetRow.addColumnValue(new DataSetColumn("f<15N", "f<15N", Integer.class),femaleNewtotal);
+		tSetRow.addColumnValue(new DataSetColumn("m<15N", "m<15N", Integer.class),maleNewtotal);
+		tSetRow.addColumnValue(new DataSetColumn("f+15P", "f+15P", Integer.class),femalePretotal);
+		tSetRow.addColumnValue(new DataSetColumn("m<15P", "m<15P", Integer.class),malePretotal);
         set.addRow(tSetRow);
 	
 		return set;

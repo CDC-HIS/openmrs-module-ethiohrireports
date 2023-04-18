@@ -5,7 +5,7 @@ import static org.openmrs.module.ohrireports.OHRIReportsConstants.PATIENT_STATUS
 import static org.openmrs.module.ohrireports.OHRIReportsConstants.RESTART;
 import static org.openmrs.module.ohrireports.OHRIReportsConstants.TREATMENT_END_DATE;
 import static org.openmrs.module.ohrireports.OHRIReportsConstants.ARV_DISPENSED_IN_DAYS;
-import static org.openmrs.module.ohrireports.OHRIReportsConstants.TB_TREATMENT_START_DATE;
+import static org.openmrs.module.ohrireports.OHRIReportsConstants.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -32,9 +32,6 @@ public class TxTbDenominatorSpecimenSentDataSetDefinitionEvaluator implements Da
 	
 	private TxTbDenominatorSpecimenSentDataSetDefinition hdsd;
 	
-	// HashMap<Integer, Concept> patientStatus = new HashMap<>();
-	private String title = "Number of ART patients who were started on TB treatment during the reporting period";
-	
 	@Autowired
 	private ConceptService conceptService;
 	
@@ -48,33 +45,54 @@ public class TxTbDenominatorSpecimenSentDataSetDefinitionEvaluator implements Da
 		context = evalContext;
 		
 		DataSetRow dataSet = new DataSetRow();
-		dataSet.addColumnValue(new DataSetColumn("adultAndChildrenEnrolled", "Numerator", Integer.class),
-		    getTBstartedInReportingPeriod());
+		dataSet.addColumnValue(new DataSetColumn("", "", String.class),
+		    "Number of ART patients who had a specimen sent for bacteriological diagnosis of active TB disease");
+		dataSet.addColumnValue(new DataSetColumn("num", "Num", Integer.class), getSpecimentSent());
 		SimpleDataSet set = new SimpleDataSet(dataSetDefinition, evalContext);
 		set.addRow(dataSet);
 		return set;
 	}
 	
-	public int getTBstartedInReportingPeriod(){
-		List<Integer> tbstarted = new ArrayList<>();
+	public Integer getSpecimentSent(){
+		List<Integer> specimenSent = new ArrayList<>();
+		List<Obs> obsSpecimenSent = new ArrayList<>();
+		List<Integer> screened = getTBscreenedInReportingPeriod();
+		if (screened == null || screened.size()==0){
+			return specimenSent.size();
+		}
+		HqlQueryBuilder queryBuilder = new HqlQueryBuilder();
+		queryBuilder.select("obs").from(Obs.class,"obs").whereEqual("obs.concept", conceptService.getConceptByUuid(SPECIMEN_SENT)).and().whereEqual("obs.valueCoded", conceptService.getConceptByUuid(YES)).and().whereIdIn("obs.personId", screened).and().whereLess("obs.obsDatetime", hdsd.getEndDate()).orderDesc("obs.personId, obs.obsDatetime");
+		obsSpecimenSent=evaluationService.evaluateToList(queryBuilder,Obs.class,context);
+		for (Obs obs:obsSpecimenSent){
+			if (!specimenSent.contains(obs.getPersonId())){
+				specimenSent.add(obs.getPersonId());
+			}
+		}
+		return specimenSent.size();
+		
+
+	}
+	
+	public List<Integer> getTBscreenedInReportingPeriod(){
+		List<Integer> tbscreened = new ArrayList<>();
 		List<Obs> obstbstarted = new ArrayList<>();
 		List<Integer> dispense = getDispenseDose();
 		if (dispense == null || dispense.size()==0){
-			return tbstarted.size();
+			return tbscreened;
 		}
 		HqlQueryBuilder queryBuilder = new HqlQueryBuilder();
-		queryBuilder.select("obs").from(Obs.class,"obs").whereEqual("obs.concept", conceptService.getConceptByUuid(TB_TREATMENT_START_DATE)).and().whereGreater("obs.valueDatetime", hdsd.getStartDate()).and().whereLess("obs.valueDatetime",hdsd.getEndDate()).orderDesc("obs.personId, obs.obsDatetime");
+		queryBuilder.select("obs").from(Obs.class,"obs").whereEqual("obs.concept", conceptService.getConceptByUuid(TB_SCREENING_DATE)).and().whereGreater("obs.valueDatetime", hdsd.getStartDate()).and().whereLess("obs.valueDatetime",hdsd.getEndDate()).and().whereIdIn("obs.personId", dispense).orderDesc("obs.personId, obs.obsDatetime");
 		obstbstarted=evaluationService.evaluateToList(queryBuilder,Obs.class,context);
 		for (Obs obs:obstbstarted){
-			if (!tbstarted.contains(obs.getPersonId())){
-				tbstarted.add(obs.getPersonId());
+			if (!tbscreened.contains(obs.getPersonId())){
+				tbscreened.add(obs.getPersonId());
 			}
 		}
-		return tbstarted.size();
+		return tbscreened;
 	}
 	
 	public List<Integer> getDispenseDose() {
-		List<Integer> pList = getDatimValidTreatmentEndDatePatients();
+		List<Integer> pList = getDatimValidTratmentEndDatePatients();
 		List<Integer> patients = new ArrayList<>();
 		if (pList == null || pList.size() == 0)
 			return patients;
@@ -90,7 +108,7 @@ public class TxTbDenominatorSpecimenSentDataSetDefinitionEvaluator implements Da
 		return patients;	
 	}
 	
-	private List<Integer> getDatimValidTreatmentEndDatePatients() {
+	private List<Integer> getDatimValidTratmentEndDatePatients() {
 
 		List<Integer> patientsId = getListOfALiveORRestartPatientObservertions();
 		List<Integer> patients = new ArrayList<>();
@@ -113,7 +131,7 @@ public class TxTbDenominatorSpecimenSentDataSetDefinitionEvaluator implements Da
                         {
                         patients.add(obs.getPersonId());
                         }
-        }			
+        }				
 		return patients;
 	}
 	
@@ -125,7 +143,7 @@ public class TxTbDenominatorSpecimenSentDataSetDefinitionEvaluator implements Da
 		queryBuilder.select("obs")
 				.from(Obs.class, "obs")
 				.whereEqual("obs.encounter.encounterType", hdsd.getEncounterType())
-				.and()
+                .and()
 				.whereEqual("obs.concept", conceptService.getConceptByUuid(PATIENT_STATUS))
 				.and()
 				.whereIn("obs.valueCoded", Arrays.asList(conceptService.getConceptByUuid(ALIVE),conceptService.getConceptByUuid(RESTART)))
