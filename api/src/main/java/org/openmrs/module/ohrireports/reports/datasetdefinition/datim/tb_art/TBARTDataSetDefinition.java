@@ -8,7 +8,7 @@ import org.openmrs.module.reporting.definition.configuration.ConfigurationProper
 import org.springframework.stereotype.Component;
 
 @Component
-public class PMTCTARTDataSetDefinition extends BaseDataSetDefinition {
+public class TBARTDataSetDefinition extends BaseDataSetDefinition {
 	
 	@ConfigurationProperty
 	private Date startDate;
@@ -18,28 +18,6 @@ public class PMTCTARTDataSetDefinition extends BaseDataSetDefinition {
 	
 	@ConfigurationProperty
 	private EncounterType encounterType;
-	
-	// @ConfigurationProperty
-	// private Boolean isNewlyEnrolled;
-	
-	// @ConfigurationProperty
-	// private String gender;
-	
-	// public String getGender() {
-	// 	return gender;
-	// }
-	
-	// public void setGender(String gender) {
-	// 	this.gender = gender;
-	// }
-	
-	// public void setNewlyEnrolled(Boolean isNewlyEnrolled) {
-	// 	this.isNewlyEnrolled = isNewlyEnrolled;
-	// }
-	
-	// public Boolean getIsNewlyEnrolled() {
-	// 	return isNewlyEnrolled;
-	// }
 	
 	public Date getStartDate() {
 		return startDate;

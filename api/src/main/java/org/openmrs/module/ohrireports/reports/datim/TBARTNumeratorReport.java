@@ -9,7 +9,7 @@ import static org.openmrs.module.ohrireports.OHRIReportsConstants.*;
 import org.openmrs.EncounterType;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.tb_art.TBARTAutoCalculateDataSetDefinition;
-import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.tb_art.PMTCTARTDataSetDefinition;
+import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.tb_art.TBARTDataSetDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.module.reporting.evaluation.parameter.Parameterizable;
@@ -72,14 +72,14 @@ public class TBARTNumeratorReport implements ReportManager {
 		            "Number of TB cases with documented HIV-positive status who start or continue ART during the reporting period. ",
 		            map(tbADataSet, "startDate=${startDateGC},endDate=${endDateGC}"));
 		
-		PMTCTARTDataSetDefinition alreadyOnARTSetDefinition = new PMTCTARTDataSetDefinition();
+		TBARTDataSetDefinition alreadyOnARTSetDefinition = new TBARTDataSetDefinition();
 		alreadyOnARTSetDefinition.addParameters(getParameters());
 		alreadyOnARTSetDefinition.setEncounterType(followUpEncounter);
 		//alreadyOnARTSetDefinition.setNewlyEnrolled(false);
 		reportDefinition.addDataSetDefinition("Disaggregated by Age/Sex/Result Already on ART",
 		    map(alreadyOnARTSetDefinition, "startDate=${startDateGC},endDate=${endDateGC}"));
 		
-		PMTCTARTDataSetDefinition newlyEnrolledSetDefinition = new PMTCTARTDataSetDefinition();
+		TBARTDataSetDefinition newlyEnrolledSetDefinition = new TBARTDataSetDefinition();
 		newlyEnrolledSetDefinition.addParameters(getParameters());
 		newlyEnrolledSetDefinition.setEncounterType(followUpEncounter);
 		//newlyEnrolledSetDefinition.setNewlyEnrolled(true);

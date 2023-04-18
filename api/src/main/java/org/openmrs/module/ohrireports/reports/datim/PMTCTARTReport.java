@@ -9,8 +9,7 @@ import static org.openmrs.module.ohrireports.OHRIReportsConstants.*;
 import org.openmrs.EncounterType;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.pmtct_art.PMTCTARTAutoCalculateDataSetDefinition;
-import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.tb_art.TBARTAutoCalculateDataSetDefinition;
-import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.tb_art.PMTCTARTDataSetDefinition;
+import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.pmtct_art.PMTCTARTDataSetDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.module.reporting.evaluation.parameter.Parameterizable;
@@ -68,21 +67,21 @@ public class PMTCTARTReport implements ReportManager {
 		PMTCTARTAutoCalculateDataSetDefinition tbADataSet = new PMTCTARTAutoCalculateDataSetDefinition();
 		tbADataSet.addParameters(getParameters());
 		tbADataSet.setEncounterType(followUpEncounter);
-		reportDefinition
-		        .addDataSetDefinition(
-		            "During pregnancy.Numerator will auto-calculate from the Maternal Regimen Type Desegregates",
-		            map(tbADataSet, "startDate=${startDateGC},endDate=${endDateGC}"));
+		reportDefinition.addDataSetDefinition(
+		    "During pregnancy.Numerator will auto-calculate from the Maternal Regimen Type Desegregates",
+		    map(tbADataSet, "startDate=${startDateGC},endDate=${endDateGC}"));
 		
 		PMTCTARTDataSetDefinition alreadyOnARTSetDefinition = new PMTCTARTDataSetDefinition();
 		alreadyOnARTSetDefinition.addParameters(getParameters());
 		alreadyOnARTSetDefinition.setEncounterType(followUpEncounter);
+		
 		reportDefinition.addDataSetDefinition("Disaggregated by Regiment Type:",
 		    map(alreadyOnARTSetDefinition, "startDate=${startDateGC},endDate=${endDateGC}"));
 		
 		PMTCTARTDataSetDefinition newlyEnrolledSetDefinition = new PMTCTARTDataSetDefinition();
 		newlyEnrolledSetDefinition.addParameters(getParameters());
 		newlyEnrolledSetDefinition.setEncounterType(followUpEncounter);
-		//newlyEnrolledSetDefinition.setNewlyEnrolled(true);
+		
 		reportDefinition.addDataSetDefinition("Disaggregated by Regiment Type:",
 		    map(newlyEnrolledSetDefinition, "startDate=${startDateGC},endDate=${endDateGC}"));
 		

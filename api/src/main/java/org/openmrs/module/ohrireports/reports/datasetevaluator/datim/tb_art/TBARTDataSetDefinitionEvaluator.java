@@ -15,7 +15,7 @@ import org.openmrs.Concept;
 import org.openmrs.Obs;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.ConceptService;
-import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.tb_art.PMTCTARTDataSetDefinition;
+import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.tb_art.TBARTDataSetDefinition;
 import org.openmrs.module.reporting.dataset.DataSet;
 import org.openmrs.module.reporting.dataset.DataSetColumn;
 import org.openmrs.module.reporting.dataset.DataSetRow;
@@ -28,7 +28,7 @@ import org.openmrs.module.reporting.evaluation.querybuilder.HqlQueryBuilder;
 import org.openmrs.module.reporting.evaluation.service.EvaluationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
-@Handler(supports = { PMTCTARTDataSetDefinition.class })
+@Handler(supports = { TBARTDataSetDefinition.class })
 public class TBARTDataSetDefinitionEvaluator implements DataSetEvaluator {
 
     private EvaluationContext context;
@@ -36,7 +36,7 @@ public class TBARTDataSetDefinitionEvaluator implements DataSetEvaluator {
     private int minCount = 0;
     private int maxCount = 4;
     List<Obs> obses = new ArrayList<>();
-    private PMTCTARTDataSetDefinition hdsd;
+    private TBARTDataSetDefinition hdsd;
 
     private Concept artConcept, treatmentConcept, tbScreenDateConcept, tbDiagnosticTestResultConcept, positiveConcept;
 
@@ -49,7 +49,7 @@ public class TBARTDataSetDefinitionEvaluator implements DataSetEvaluator {
     @Override
     public DataSet evaluate(DataSetDefinition dataSetDefinition, EvaluationContext evalContext)
             throws EvaluationException {
-        hdsd = (PMTCTARTDataSetDefinition) dataSetDefinition;
+        hdsd = (TBARTDataSetDefinition) dataSetDefinition;
         context = evalContext;
         setRequiredConcepts();
         SimpleDataSet simpleDataSet = new SimpleDataSet(dataSetDefinition, evalContext);

@@ -19,7 +19,6 @@ public class PMTCTARTDataSetDefinition extends BaseDataSetDefinition {
 	@ConfigurationProperty
 	private EncounterType encounterType;
 	
-	
 	public Date getStartDate() {
 		return startDate;
 	}
