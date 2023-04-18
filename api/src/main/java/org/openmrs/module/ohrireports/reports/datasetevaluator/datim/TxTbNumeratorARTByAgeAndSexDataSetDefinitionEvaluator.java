@@ -186,7 +186,7 @@ public class TxTbNumeratorARTByAgeAndSexDataSetDefinitionEvaluator implements Da
 		return tbstarted;
 	}
 	public List<Integer> getDispenseDose(String gender) {
-		List<Integer> pList = getDatimValidTratmentEndDatePatients(gender);
+		List<Integer> pList = getDatimValidTreatmentEndDatePatients(gender);
 		List<Integer> patients = new ArrayList<>();
 		if (pList == null || pList.size() == 0)
 			return patients;
@@ -202,7 +202,7 @@ public class TxTbNumeratorARTByAgeAndSexDataSetDefinitionEvaluator implements Da
 		return patients;	
 	}
 	
-	private List<Integer> getDatimValidTratmentEndDatePatients(String gender) {
+	private List<Integer> getDatimValidTreatmentEndDatePatients(String gender) {
 
 		List<Integer> patientsId = getListOfALiveORRestartPatientObservertions(gender);
 		List<Integer> patients = new ArrayList<>();
