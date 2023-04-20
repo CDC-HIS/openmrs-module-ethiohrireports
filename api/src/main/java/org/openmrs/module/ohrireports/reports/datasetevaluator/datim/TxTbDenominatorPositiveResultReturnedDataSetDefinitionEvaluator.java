@@ -33,8 +33,6 @@ public class TxTbDenominatorPositiveResultReturnedDataSetDefinitionEvaluator imp
 	
 	private TxTbDenominatorPositiveResultReturnedDataSetDefinition hdsd;
 	
-	private Concept tbDiagnosticTestResultConcept, positiveConcept;
-	
 	@Autowired
 	private ConceptService conceptService;
 	
@@ -46,8 +44,7 @@ public class TxTbDenominatorPositiveResultReturnedDataSetDefinitionEvaluator imp
 		
 		hdsd = (TxTbDenominatorPositiveResultReturnedDataSetDefinition) dataSetDefinition;
 		context = evalContext;
-		tbDiagnosticTestResultConcept = conceptService.getConceptByUuid(TB_DIAGNOSTIC_TEST_RESULT);
-		positiveConcept = conceptService.getConceptByUuid(POSITIVE);
+	
 		
 		DataSetRow dataSet = new DataSetRow();
 		dataSet.addColumnValue(new DataSetColumn("", "", String.class),
