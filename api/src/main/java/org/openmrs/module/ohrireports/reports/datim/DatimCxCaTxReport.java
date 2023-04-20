@@ -72,7 +72,7 @@ public class DatimCxCaTxReport implements ReportManager {
 		fDefinition.addParameters(getParameters());
 		fDefinition.setDescription("Disaggregated by Age/Treatment Type/Screening Visit Type");
 		fDefinition.setEncounterType(Context.getEncounterService().getEncounterTypeByUuid(HTS_FOLLOW_UP_ENCOUNTER_TYPE));
-		reportDefinition.addDataSetDefinition("Required Disaggregated by Age/Treatment Type/Screening Visit Type",
+		reportDefinition.addDataSetDefinition("Required Disaggregated by Age/Treatment Type/Screening Visit Type, First time screened for cervical cancer",
 		    map(fDefinition, "startDate=${startDateGC},endDate=${endDateGC}"));
 		
 			CxCaTxRescreenedDataSetDefinition rDefinition = new CxCaTxRescreenedDataSetDefinition();

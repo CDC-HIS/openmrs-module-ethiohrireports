@@ -58,6 +58,8 @@ public class CxCaTxByAgeandTreatmentTypeandScreeningVisitTypeDataSetDefinitionEv
         getEnrolledByAgeAndGender(0, 1));
 
         buildDataSet(cryotherapy);
+        cryotherapy.addColumnValue(new DataSetColumn("subtotal", "Subtotal", Integer.class),
+        obses.size());
         set.addRow(cryotherapy);
 
         obses = getByScreenType(CXCA_TREATMENT_TYPE_LEEP);
@@ -69,9 +71,9 @@ public class CxCaTxByAgeandTreatmentTypeandScreeningVisitTypeDataSetDefinitionEv
         getUnknownAgeByGender());
         leep.addColumnValue(new DataSetColumn("<1", "Below One (<1)", Integer.class),
                 getEnrolledByAgeAndGender(0, 1));
-
         buildDataSet(leep);
-
+        leep.addColumnValue(new DataSetColumn("subtotal", "Subtotal", Integer.class),
+                obses.size());
         set.addRow(leep);
         
         obses = getByScreenType(CXCA_TREATMENT_TYPE_THERMOCOAGULATION);
@@ -84,8 +86,12 @@ public class CxCaTxByAgeandTreatmentTypeandScreeningVisitTypeDataSetDefinitionEv
                 getEnrolledByAgeAndGender(0, 1));
 
         buildDataSet(thermocoagulation);
-
+        leep.addColumnValue(new DataSetColumn("subtotal", "Subtotal", Integer.class),
+                obses.size());
         set.addRow(thermocoagulation);
+        DataSetRow subtotal = new DataSetRow();
+        subtotal.addColumnValue(new DataSetColumn("subtotal", "subtotal",Integer.class), getCxCaFirstTimeStarted().size());
+        set.addRow(subtotal);
         return set;
     }
 
