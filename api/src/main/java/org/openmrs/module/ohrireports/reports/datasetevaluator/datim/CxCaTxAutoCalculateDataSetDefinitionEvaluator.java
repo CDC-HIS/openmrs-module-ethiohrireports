@@ -43,13 +43,12 @@ public class CxCaTxAutoCalculateDataSetDefinitionEvaluator implements DataSetEva
 		hdsd = (CxCaTxAutoCalculateDataSetDefinition) dataSetDefinition;
 		context = evalContext;
 		DataSetRow dataSet = new DataSetRow();
-		dataSet.addColumnValue(new DataSetColumn("womenEnrolled", "Numerator", Integer.class),
-		getCxCAStartedPatients());
+		dataSet.addColumnValue(new DataSetColumn("womenEnrolled", "Numerator", Integer.class), getCxCAStartedPatients());
 		SimpleDataSet set = new SimpleDataSet(dataSetDefinition, evalContext);
 		set.addRow(dataSet);
 		return set;
 	}
-
+	
 	private Integer getCxCAStartedPatients() {
 		List<Integer> patientsId = getArtstartedPatients();
 		List<Integer> patients = new ArrayList<>();
@@ -72,7 +71,7 @@ public class CxCaTxAutoCalculateDataSetDefinitionEvaluator implements DataSetEva
 		return patients.size();
 		
 	}
-
+	
 	private List<Integer> getArtstartedPatients() {
 		List<Integer> patientsId = getDatimTxCurrTotalEnrolledPatients();
 		List<Integer> patients = new ArrayList<>();
