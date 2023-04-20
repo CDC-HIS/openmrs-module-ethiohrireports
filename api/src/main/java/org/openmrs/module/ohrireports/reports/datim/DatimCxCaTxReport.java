@@ -27,17 +27,17 @@ public class DatimCxCaTxReport implements ReportManager {
 	
 	@Override
 	public String getUuid() {
-		return "7529482a-e57c-47d3-9dc3-57c4ad9e28bf";
+		return "7529cxca-e57c-47d3-9dc3-57c4ad9e28bf";
 	}
 	
 	@Override
 	public String getName() {
-		return DATIM_REPORT + "-Tx_Curr";
+		return DATIM_REPORT + "-Cx_CA_Tx";
 	}
 	
 	@Override
 	public String getDescription() {
-		return "Aggregate report of DATIM TX_CURR enrolling  patients";
+		return "Calculate the total number of HIV positive women who are currently on ART and received treatment for cervical cancer in the reporting period";
 	}
 	
 	@Override
@@ -64,7 +64,8 @@ public class DatimCxCaTxReport implements ReportManager {
 		CxCaTxAutoCalculateDataSetDefinition aDefinition = new CxCaTxAutoCalculateDataSetDefinition();
 		aDefinition.addParameters(getParameters());
 		aDefinition.setEncounterType(Context.getEncounterService().getEncounterTypeByUuid(HTS_FOLLOW_UP_ENCOUNTER_TYPE));
-		aDefinition.setDescription("Total Number of female clients Currently on ART and received treatment forCervical Cancer during the reporting period");
+		aDefinition
+		        .setDescription("Total Number of female clients Currently on ART and received treatment forCervical Cancer during the reporting period");
 		reportDefinition.addDataSetDefinition("Auto-Calculate",
 		    map(aDefinition, "startDate=${startDateGC},endDate=${endDateGC}"));
 		
@@ -72,23 +73,23 @@ public class DatimCxCaTxReport implements ReportManager {
 		fDefinition.addParameters(getParameters());
 		fDefinition.setDescription("Disaggregated by Age/Treatment Type/Screening Visit Type");
 		fDefinition.setEncounterType(Context.getEncounterService().getEncounterTypeByUuid(HTS_FOLLOW_UP_ENCOUNTER_TYPE));
-		reportDefinition.addDataSetDefinition("Required Disaggregated by Age/Treatment Type/Screening Visit Type, First time screened for cervical cancer",
+		reportDefinition.addDataSetDefinition(
+		    "Required Disaggregated by Age/Treatment Type/Screening Visit Type, First time screened for cervical cancer",
 		    map(fDefinition, "startDate=${startDateGC},endDate=${endDateGC}"));
 		
-			CxCaTxRescreenedDataSetDefinition rDefinition = new CxCaTxRescreenedDataSetDefinition();
+		CxCaTxRescreenedDataSetDefinition rDefinition = new CxCaTxRescreenedDataSetDefinition();
 		rDefinition.addParameters(getParameters());
 		rDefinition.setEncounterType(Context.getEncounterService().getEncounterTypeByUuid(HTS_FOLLOW_UP_ENCOUNTER_TYPE));
 		rDefinition.setDescription("Rescreened after previous negative or suspected cancer");
 		reportDefinition.addDataSetDefinition("Conditional Rescreened after previous negative or suspected cancer",
 		    map(rDefinition, "startDate=${startDateGC},endDate=${endDateGC}"));
 		
-			CxCaTxPostTreatmentFollowupDataSetDefinition pDefinition = new CxCaTxPostTreatmentFollowupDataSetDefinition();
+		CxCaTxPostTreatmentFollowupDataSetDefinition pDefinition = new CxCaTxPostTreatmentFollowupDataSetDefinition();
 		pDefinition.addParameters(getParameters());
 		pDefinition.setEncounterType(Context.getEncounterService().getEncounterTypeByUuid(HTS_FOLLOW_UP_ENCOUNTER_TYPE));
 		pDefinition.setDescription("Post treatment follow-up");
 		reportDefinition.addDataSetDefinition("Conditional Post treatment follow-up",
 		    map(pDefinition, "startDate=${startDateGC},endDate=${endDateGC}"));
-		
 		
 		return reportDefinition;
 	}
@@ -105,7 +106,7 @@ public class DatimCxCaTxReport implements ReportManager {
 	
 	@Override
 	public List<ReportDesign> constructReportDesigns(ReportDefinition reportDefinition) {
-		ReportDesign design = ReportManagerUtil.createExcelDesign("bfe17f94-383a-472b-8eac-17fc5bef95a1`", reportDefinition);
+		ReportDesign design = ReportManagerUtil.createExcelDesign("bfe1cxca-383a-472b-8eac-17fc5bef95a1`", reportDefinition);
 		
 		return Arrays.asList(design);
 		

@@ -44,7 +44,6 @@ public class TxTbDenominatorPositiveResultReturnedDataSetDefinitionEvaluator imp
 		
 		hdsd = (TxTbDenominatorPositiveResultReturnedDataSetDefinition) dataSetDefinition;
 		context = evalContext;
-	
 		
 		DataSetRow dataSet = new DataSetRow();
 		dataSet.addColumnValue(new DataSetColumn("", "", String.class),

@@ -86,10 +86,12 @@ public class CxCaTxByAgeandTreatmentTypeandScreeningVisitTypeDataSetDefinitionEv
                 getEnrolledByAgeAndGender(0, 1));
 
         buildDataSet(thermocoagulation);
-        leep.addColumnValue(new DataSetColumn("subtotal", "Subtotal", Integer.class),
+        thermocoagulation.addColumnValue(new DataSetColumn("subtotal", "Subtotal", Integer.class),
                 obses.size());
         set.addRow(thermocoagulation);
         DataSetRow subtotal = new DataSetRow();
+        subtotal.addColumnValue(new DataSetColumn("screenType", "",
+                Integer.class), "Total");
         subtotal.addColumnValue(new DataSetColumn("subtotal", "subtotal",Integer.class), getCxCaFirstTimeStarted().size());
         set.addRow(subtotal);
         return set;
