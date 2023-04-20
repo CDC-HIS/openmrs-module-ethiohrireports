@@ -53,10 +53,6 @@ public class CxCaTxRescreenedDataSetDefinitionEvaluator implements DataSetEvalua
                 Integer.class), "Cryotherapy");
         cryotherapy.addColumnValue(new DataSetColumn("unknownAge", "Unknown Age", Integer.class),
         getUnknownAgeByGender());
-
-        cryotherapy.addColumnValue(new DataSetColumn("<1", "Below One (<1)", Integer.class),
-        getEnrolledByAgeAndGender(0, 1));
-
         buildDataSet(cryotherapy);
         cryotherapy.addColumnValue(new DataSetColumn("subtotal", "Subtotal", Integer.class),
         obses.size());
@@ -69,8 +65,6 @@ public class CxCaTxRescreenedDataSetDefinitionEvaluator implements DataSetEvalua
                 Integer.class), "Leep");
         leep.addColumnValue(new DataSetColumn("unknownAge", "Unknown Age", Integer.class),
         getUnknownAgeByGender());
-        leep.addColumnValue(new DataSetColumn("<1", "Below One (<1)", Integer.class),
-                getEnrolledByAgeAndGender(0, 1));
         buildDataSet(leep);
         leep.addColumnValue(new DataSetColumn("subtotal", "Subtotal", Integer.class),
                 obses.size());
@@ -82,9 +76,6 @@ public class CxCaTxRescreenedDataSetDefinitionEvaluator implements DataSetEvalua
                 Integer.class), "Thermocoagulation");
         thermocoagulation.addColumnValue(new DataSetColumn("unknownAge", "Unknown Age", Integer.class),
         getUnknownAgeByGender());
-        thermocoagulation.addColumnValue(new DataSetColumn("<1", "Below One (<1)", Integer.class),
-                getEnrolledByAgeAndGender(0, 1));
-
         buildDataSet(thermocoagulation);
         thermocoagulation.addColumnValue(new DataSetColumn("subtotal", "Subtotal", Integer.class),
                 obses.size());
@@ -98,8 +89,8 @@ public class CxCaTxRescreenedDataSetDefinitionEvaluator implements DataSetEvalua
     }
 
     private void buildDataSet(DataSetRow dataSet) {
-        minCount = 1;
-        maxCount = 4;
+        minCount = 15;
+        maxCount = 19;
         while (minCount <= 65) {
             if (minCount == 65) {
                 dataSet.addColumnValue(new DataSetColumn("65+", "65+", Integer.class),
