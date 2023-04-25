@@ -9,8 +9,6 @@
  */
 package org.openmrs.module.ohrireports;
 
-import org.apache.xmlbeans.impl.xb.xsdschema.Public;
-
 public class OHRIReportsConstants {
 	
 	/**
@@ -80,7 +78,7 @@ public class OHRIReportsConstants {
 	
 	public final static String RETURN_VISIT_DATE = "5096AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 	
-	//public final static String POSITIVE = "6378487b-584d-4422-a6a6-56c8830873ff";
+	// public final static String POSITIVE = "6378487b-584d-4422-a6a6-56c8830873ff";
 	public final static String POSITIVE = "703AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 	
 	public final static String NEGATIVE = "664AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
@@ -178,23 +176,37 @@ public class OHRIReportsConstants {
 	
 	public final static String RESTART = "ee957295-85b9-4433-bf12-45886cdc7dd1";
 	
-	//#region
+	public final static String PR_EP_STARTED = "3b4bc0b2-acbb-4fb5-82eb-6f0479915862";
+	
+	// #region
 	public final static String UNIQUE_ANTIRETROVAIRAL_THERAPY_UAN = "164402AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 	
 	public final static String SERVICE_DELIVERY_POINT_NUMBER_MRN = "162054AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 	
 	public final static String TB_TREATMENT_START_DATE = "1113AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 	
-	//TODO: update as soon as the concept created 
+	// TODO: update as soon as the concept created
 	public final static String ADHERENCE_UUID = "";
 	
-	//#endregion
+	// #endregion
 	
-	//#region Report Group 
+	// #region Report Group
 	public final static String DATIM_REPORT = "DATIM";
 	
 	public final static String HISM_REPORT = "HISM";
 	
 	public final static String LINE_LIST_REPORT = "LINELIST";
-	//#endregion
+	
+	// #endregion
+	
+	// #region drug concept uuid
+	public final static String TDF_TENOFOVIR_DRUG = "84795AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+	
+	public final static String TDF_FTC_DRUG = "104567AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+	
+	public final static String TDF_3TC_DRUG = "97d14de6-89c4-49cb-9553-55de5cbc9b03";
+	
+	// #endregion
+	
+	public final static String REPORT_VERSION = "1.0.0-SNAPSHOT";
 }

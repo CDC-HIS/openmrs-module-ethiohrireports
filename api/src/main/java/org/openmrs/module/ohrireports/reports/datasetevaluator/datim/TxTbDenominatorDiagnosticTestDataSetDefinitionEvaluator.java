@@ -61,9 +61,11 @@ public class TxTbDenominatorDiagnosticTestDataSetDefinitionEvaluator implements 
 		List<Integer> smearOnly = new ArrayList<>();
 		List<Obs> obsSmearOnly = new ArrayList<>();
 		List<Integer> specimenSents = getTBscreenedInReportingPeriod();
+		
 		if (specimenSents == null || specimenSents.size()==0){
 			return smearOnly.size();
 		}
+		
 		HqlQueryBuilder queryBuilder = new HqlQueryBuilder();
 		queryBuilder.select("obs").from(Obs.class,"obs").whereEqual("obs.concept", conceptService.getConceptByUuid(DIAGNOSTIC_TEST)).and().whereEqual("obs.valueCoded", conceptService.getConceptByUuid(SMEAR_ONLY)).and().whereIdIn("obs.personId", specimenSents).and().whereLess("obs.obsDatetime", hdsd.getEndDate()).orderDesc("obs.personId, obs.obsDatetime");
 		obsSmearOnly=evaluationService.evaluateToList(queryBuilder,Obs.class,context);
