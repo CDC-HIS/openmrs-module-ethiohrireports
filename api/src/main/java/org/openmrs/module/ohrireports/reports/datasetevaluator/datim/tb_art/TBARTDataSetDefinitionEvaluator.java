@@ -179,7 +179,7 @@ public class TBARTDataSetDefinitionEvaluator implements DataSetEvaluator {
                 .whereEqual("obs.encounter.encounterType", hdsd.getEncounterType())
                 .and()
                 .whereEqual("obs.person.gender", gender)
-                .whereEqual("obs.concept", artConcept).and();
+                .whereEqual("obs.concept", artConcept);
             if (!isAlreadyOnArt) {
             queryBuilder.whereBetweenInclusive("obs.valueDatetime", hdsd.getStartDate(),
              hdsd.getEndDate());
@@ -197,19 +197,20 @@ public class TBARTDataSetDefinitionEvaluator implements DataSetEvaluator {
     private List<Integer> getOnTreatmentPatients() {
         HqlQueryBuilder queryBuilder = new HqlQueryBuilder();
         queryBuilder.select("distinct obs.personId").from(Obs.class, "obs")
-                .whereEqual("obs.encounter.encounterType", hdsd.getEncounterType()).and()
-                .whereEqual("obs.concept", treatmentConcept).and()
-                .whereGreater("obs.valueDatetime", hdsd.getStartDate());
+                    .whereEqual("obs.encounter.encounterType", hdsd.getEncounterType()).and()
+                    .whereEqual("obs.concept", treatmentConcept).and()
+                    .whereGreater("obs.valueDatetime", hdsd.getStartDate());
         return evaluationService.evaluateToList(queryBuilder, Integer.class, context);
     }
 
     private List<Integer> getPatientsWithTB() {
         HqlQueryBuilder queryBuilder = new HqlQueryBuilder();
         queryBuilder.select("obs").from(Obs.class, "obs")
-                .whereEqual("obs.encounter.encounterType", hdsd.getEncounterType())
-                .and().whereEqual("obs.concept", tbDiagnosticTestResultConcept).and()
-                .whereEqual("obs.valueCoded", positiveConcept)
-                .and().whereIdIn("obs.personId", getOnTreatmentPatients());
+                    .whereEqual("obs.encounter.encounterType", hdsd.getEncounterType())
+                    .and()
+                    .whereEqual("obs.concept", tbDiagnosticTestResultConcept).and()
+                    .whereEqual("obs.valueCoded", positiveConcept)
+                    .and().whereIdIn("obs.personId", getOnTreatmentPatients());
         return evaluationService.evaluateToList(queryBuilder, Integer.class, context);
 
     }

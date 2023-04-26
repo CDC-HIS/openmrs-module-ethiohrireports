@@ -33,7 +33,7 @@ public class PrEPNewReport implements ReportManager {
 	
 	@Override
 	public String getName() {
-		return DATIM_REPORT + "-DSD:PrEP_New";
+		return DATIM_REPORT + "-PrEP_New";
 	}
 	
 	@Override
