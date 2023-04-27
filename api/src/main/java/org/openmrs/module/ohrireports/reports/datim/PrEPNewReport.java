@@ -89,7 +89,7 @@ public class PrEPNewReport implements ReportManager {
 	
 	@Override
 	public List<ReportDesign> constructReportDesigns(ReportDefinition reportDefinition) {
-		ReportDesign design = ReportManagerUtil.createExcelDesign("08c71152-c552-42e7-b094-f510ff44e9cb", reportDefinition);
+		ReportDesign design = ReportManagerUtil.createExcelDesign("ba0df56a-2902-4c7f-a32f-e7f552431105", reportDefinition);
 		
 		return Arrays.asList(design);
 	}

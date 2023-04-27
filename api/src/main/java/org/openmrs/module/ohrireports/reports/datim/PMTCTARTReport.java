@@ -90,7 +90,7 @@ public class PMTCTARTReport implements ReportManager {
 	
 	@Override
 	public List<ReportDesign> constructReportDesigns(ReportDefinition reportDefinition) {
-		ReportDesign design = ReportManagerUtil.createExcelDesign("c3ef9586-cadd-4ce3-bc07-3e1ed79c994d", reportDefinition);
+		ReportDesign design = ReportManagerUtil.createExcelDesign("39f4d2f0-f0c5-4090-82ce-1b627fc936fa", reportDefinition);
 		
 		return Arrays.asList(design);
 		

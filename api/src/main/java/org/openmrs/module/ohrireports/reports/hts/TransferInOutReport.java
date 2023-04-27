@@ -91,7 +91,7 @@ public class TransferInOutReport implements ReportManager {
 	
 	@Override
 	public List<ReportDesign> constructReportDesigns(ReportDefinition reportDefinition) {
-		ReportDesign design = ReportManagerUtil.createExcelDesign("08c71152-c552-42e7-b094-f510ff44e9cb", reportDefinition);
+		ReportDesign design = ReportManagerUtil.createExcelDesign("35a15208-e04b-4af9-98d2-54437dfdb514", reportDefinition);
 		
 		return Arrays.asList(design);
 	}

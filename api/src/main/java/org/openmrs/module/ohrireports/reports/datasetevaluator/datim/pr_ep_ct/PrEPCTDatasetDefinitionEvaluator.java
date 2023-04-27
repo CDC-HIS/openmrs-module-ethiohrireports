@@ -140,22 +140,15 @@ public class PrEPCTDatasetDefinitionEvaluator implements DataSetEvaluator {
 	
 	private void getAll(String gender) {
 		HqlQueryBuilder queryBuilder = new HqlQueryBuilder();
-		queryBuilder
-		        .select("obs")
-		        .from(Obs.class, "obs")
+		queryBuilder.select("obs").from(Obs.class, "obs")
 		        .whereEqual("obs.encounter.encounterType", auCDataSetDefinition.getEncounterType())
-		        .whereIn("obs.valueCoded", Arrays.asList(tdfConcept, tdf3tcConcept, tdf_ftcConcept))
-		        .and()
-		        .whereEqual("obs.person.gender", gender)
-		        .and()
-		        .whereLess("obs.obsDatetime", auCDataSetDefinition.getStartDate())
-				.and()
-				.whereIn("obs.personId", getOnPrEpPatients());
+		        .whereIn("obs.valueCoded", Arrays.asList(tdfConcept, tdf3tcConcept, tdf_ftcConcept)).and()
+		        .whereEqual("obs.person.gender", gender).and()
+		        .whereLess("obs.obsDatetime", auCDataSetDefinition.getStartDate()).and()
+		        .whereIn("obs.personId", getOnPrEpPatients());
 		obses = evaluationService.evaluateToList(queryBuilder, Obs.class, context);
 		
 	}
-	
-	
 	
 	private void incrementTotalCount(int count) {
 		if (count > 0)
@@ -167,7 +160,6 @@ public class PrEPCTDatasetDefinitionEvaluator implements DataSetEvaluator {
             obses.removeIf(p -> p.getPersonId().equals(pId));
         }
     }
-	
 	
 	private List<Integer> getPreviouslyOnPrEpPatients() {
 		HqlQueryBuilder queryBuilder = new HqlQueryBuilder();
@@ -188,9 +180,7 @@ public class PrEPCTDatasetDefinitionEvaluator implements DataSetEvaluator {
 		        .whereEqual("obs.concept", prEpStatedConcept)
 		        .and()
 		        .whereBetweenInclusive("obs.valueDatetime", auCDataSetDefinition.getStartDate(),
-		            auCDataSetDefinition.getEndDate())
-				.and()
-				.whereIn("obs.personId", getPreviouslyOnPrEpPatients());
+		            auCDataSetDefinition.getEndDate()).and().whereIn("obs.personId", getPreviouslyOnPrEpPatients());
 		return evaluationService.evaluateToList(queryBuilder, Integer.class, context);
 	}
 }

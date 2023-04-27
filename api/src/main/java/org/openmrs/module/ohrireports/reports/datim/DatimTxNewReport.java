@@ -31,7 +31,7 @@ public class DatimTxNewReport implements ReportManager {
 	
 	@Override
 	public String getUuid() {
-		return "8b70b3dd-5e4d-4e68-bba1-10b31747b39b";
+		return "9f9f13aa-65cb-44c2-a2e8-1ff058f8c959";
 	}
 	
 	@Override
@@ -115,7 +115,7 @@ public class DatimTxNewReport implements ReportManager {
 	
 	@Override
 	public List<ReportDesign> constructReportDesigns(ReportDefinition reportDefinition) {
-		ReportDesign design = ReportManagerUtil.createExcelDesign("8b70b3dd-0c07-44c6-a4f5-0201fcb2d55d", reportDefinition);
+		ReportDesign design = ReportManagerUtil.createExcelDesign("c29ab966-7727-4e66-95e9-d1aeba22caf1", reportDefinition);
 		
 		return Arrays.asList(design);
 		

@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 @Handler(supports = { AutoCalculatePrEPCTDatasetDefinition.class })
 public class AutoCalculatePrEPCTDatasetDefinitionEvaluator implements DataSetEvaluator {
+	
 	private Concept tdfConcept, tdf_ftcConcept, tdf3tcConcept, prEpStatedConcept;
 	
 	@Autowired
@@ -38,7 +39,7 @@ public class AutoCalculatePrEPCTDatasetDefinitionEvaluator implements DataSetEva
 	private AutoCalculatePrEPCTDatasetDefinition aucDataset;
 	
 	private EvaluationContext context;
-
+	
 	@Override
 	public DataSet evaluate(DataSetDefinition dataSetDefinition, EvaluationContext evalContext) throws EvaluationException {
 		
@@ -54,28 +55,20 @@ public class AutoCalculatePrEPCTDatasetDefinitionEvaluator implements DataSetEva
 		dataSet.addRow(dRow);
 		return dataSet;
 	}
-
 	
-		
 	private void loadConcepts() {
 		tdfConcept = conceptService.getConceptByUuid(TDF_TENOFOVIR_DRUG);
 		tdf_ftcConcept = conceptService.getConceptByUuid(TDF_FTC_DRUG);
 		tdf3tcConcept = conceptService.getConceptByUuid(TDF_3TC_DRUG);
 		prEpStatedConcept = conceptService.getConceptByUuid(PR_EP_STARTED);
 	}
-
 	
 	public int getAllCount() {
 		HqlQueryBuilder queryBuilder = new HqlQueryBuilder();
-		queryBuilder
-		        .select("distinct obs.personId")
-		        .from(Obs.class, "obs")
+		queryBuilder.select("distinct obs.personId").from(Obs.class, "obs")
 		        .whereEqual("obs.encounter.encounterType", aucDataset.getEncounterType())
-		        .whereIn("obs.valueCoded", Arrays.asList(tdfConcept, tdf3tcConcept, tdf_ftcConcept))
-		        .and()
-		        .whereLess("obs.obsDatetime", aucDataset.getStartDate())
-				.and()
-				.whereIn("obs.personId", getOnPrEpPatients());
+		        .whereIn("obs.valueCoded", Arrays.asList(tdfConcept, tdf3tcConcept, tdf_ftcConcept)).and()
+		        .whereLess("obs.obsDatetime", aucDataset.getStartDate()).and().whereIn("obs.personId", getOnPrEpPatients());
 		List<Integer> personIdList = evaluationService.evaluateToList(queryBuilder, Integer.class, context);
 		return personIdList.size();
 		
@@ -85,24 +78,17 @@ public class AutoCalculatePrEPCTDatasetDefinitionEvaluator implements DataSetEva
 		HqlQueryBuilder queryBuilder = new HqlQueryBuilder();
 		queryBuilder.select("obs").from(Obs.class, "obs")
 		
-		.whereEqual("obs.concept", prEpStatedConcept).and()
-		        .whereLess("obs.valueDatetime", aucDataset.getStartDate());
+		.whereEqual("obs.concept", prEpStatedConcept).and().whereLess("obs.valueDatetime", aucDataset.getStartDate());
 		return evaluationService.evaluateToList(queryBuilder, Integer.class, context);
 	}
 	
 	private List<Integer> getOnPrEpPatients() {
 		HqlQueryBuilder queryBuilder = new HqlQueryBuilder();
-		queryBuilder
-		        .select("obs")
-		        .from(Obs.class, "obs")
-		        .whereEqual("obs.encounter.encounterType", aucDataset.getEncounterType())
-		        .and()
-		        .whereEqual("obs.concept", prEpStatedConcept)
-		        .and()
-		        .whereBetweenInclusive("obs.valueDatetime", aucDataset.getStartDate(),
-		            aucDataset.getEndDate())
-				.and()
-				.whereIn("obs.personId", getPreviouslyOnPrEpPatients());
+		queryBuilder.select("obs").from(Obs.class, "obs")
+		        .whereEqual("obs.encounter.encounterType", aucDataset.getEncounterType()).and()
+		        .whereEqual("obs.concept", prEpStatedConcept).and()
+		        .whereBetweenInclusive("obs.valueDatetime", aucDataset.getStartDate(), aucDataset.getEndDate()).and()
+		        .whereIn("obs.personId", getPreviouslyOnPrEpPatients());
 		return evaluationService.evaluateToList(queryBuilder, Integer.class, context);
 	}
 }

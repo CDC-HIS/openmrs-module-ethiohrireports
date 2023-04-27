@@ -17,7 +17,6 @@ public class PrEPCTByPopulationTypeDatasetDefinitionEvaluator implements DataSet
 	@Override
 	public DataSet evaluate(DataSetDefinition dataSetDefinition, EvaluationContext evalContext) throws EvaluationException {
 		
-		
 		SimpleDataSet set = new SimpleDataSet(dataSetDefinition, evalContext);
 		DataSetRow dRow = new DataSetRow();
 		dRow.addColumnValue(new DataSetColumn("Name", "Name", String.class), "PWID");

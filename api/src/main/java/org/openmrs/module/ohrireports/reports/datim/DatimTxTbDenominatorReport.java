@@ -28,7 +28,7 @@ public class DatimTxTbDenominatorReport implements ReportManager {
 	
 	@Override
 	public String getUuid() {
-		return "752txtbd-e57c-47d3-9dc3-57c4ad9e28bf";
+		return "3172dd1a-ca9b-4146-9053-b48b3428dd21";
 	}
 	
 	@Override
@@ -114,7 +114,7 @@ public class DatimTxTbDenominatorReport implements ReportManager {
 	
 	@Override
 	public List<ReportDesign> constructReportDesigns(ReportDefinition reportDefinition) {
-		ReportDesign design = ReportManagerUtil.createExcelDesign("752txtbd-0c07-44c6-a4f5-0201fcb2d55d", reportDefinition);
+		ReportDesign design = ReportManagerUtil.createExcelDesign("006145f4-a8bb-4876-ad6d-f2a020778534", reportDefinition);
 		
 		return Arrays.asList(design);
 		

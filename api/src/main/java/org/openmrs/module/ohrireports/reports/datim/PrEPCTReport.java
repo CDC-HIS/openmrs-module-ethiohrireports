@@ -27,7 +27,7 @@ public class PrEPCTReport implements ReportManager {
 	
 	@Override
 	public String getUuid() {
-		return "89cfddbf-a138-4be0-b97e-3a54a8583a2a";
+		return "17ec12f4-7475-4deb-9b4a-ee8df5c667a3";
 	}
 	
 	@Override
