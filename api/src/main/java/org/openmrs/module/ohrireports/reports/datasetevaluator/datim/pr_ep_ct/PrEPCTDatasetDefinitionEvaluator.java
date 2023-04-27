@@ -88,7 +88,7 @@ public class PrEPCTDatasetDefinitionEvaluator implements DataSetEvaluator {
 		
 		while (minCount <= 50) {
 			if (minCount == 50) {
-				dataSet.addColumnValue(new DataSetColumn("65+", "65+", Integer.class),
+				dataSet.addColumnValue(new DataSetColumn("50+", "50+", Integer.class),
 				    getEnrolledByAgeAndGender(50, 200, gender));
 			} else {
 				dataSet.addColumnValue(

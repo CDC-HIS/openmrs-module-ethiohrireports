@@ -7,7 +7,10 @@ import java.util.List;
 import org.openmrs.EncounterType;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.pr_ep_ct.AutoCalculatePrEPCTDatasetDefinition;
+import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.pr_ep_ct.PrEPCTByPopulationTypeDatasetDefinition;
 import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.pr_ep_ct.PrEPCTDatasetDefinition;
+import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.pr_ep_ct.PrEPCTPregnantBreastfeedingDatasetDefinition;
+import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.pr_ep_ct.PrEPCTTestResultDatasetDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.module.reporting.evaluation.parameter.Parameterizable;
@@ -72,16 +75,27 @@ public class PrEPCTReport implements ReportManager {
 		
 		PrEPCTDatasetDefinition dataSetDefinition = new PrEPCTDatasetDefinition();
 		dataSetDefinition.setParameters(getParameters());
-		dataSetDefinition.setEncounterType(Context.getEncounterService()
-		        .getEncounterTypeByUuid(HTS_FOLLOW_UP_ENCOUNTER_TYPE));
+		dataSetDefinition.setEncounterType(followUpEncounter);
 		reportDefinition.addDataSetDefinition("Disaggregated by Age / Sex",
 		    map(dataSetDefinition, "startDate=${startDateGC},endDate=${endDateGC}"));
 		
-		// DisaggregatedByPopulationTypDatasetDefinition dDataSetDefinition = new DisaggregatedByPopulationTypDatasetDefinition();
-		// dDataSetDefinition.setParameters(getParameters());
-		// dDataSetDefinition.setEncounterType(followUpEncounter);
-		// reportDefinition.addDataSetDefinition("Disaggregated by key population type",
-		//     map(dDataSetDefinition, "startDate=${startDateGC},endDate=${endDateGC}"));
+		PrEPCTTestResultDatasetDefinition prEPCTTestDataset = new PrEPCTTestResultDatasetDefinition();
+		prEPCTTestDataset.addParameters(getParameters());
+		prEPCTTestDataset.setEncounterType(followUpEncounter);
+		reportDefinition.addDataSetDefinition("Disaggregated by test result",
+		    map(prEPCTTestDataset, "startDate=${startDateGC},endDate=${endDateGC}"));
+		
+		PrEPCTByPopulationTypeDatasetDefinition prEPCTDataset = new PrEPCTByPopulationTypeDatasetDefinition();
+		prEPCTDataset.addParameters(getParameters());
+		prEPCTDataset.setEncounterType(followUpEncounter);
+		reportDefinition.addDataSetDefinition("Disaggregated by key population type",
+		    map(prEPCTDataset, "startDate=${startDateGC},endDate=${endDateGC}"));
+		
+		PrEPCTPregnantBreastfeedingDatasetDefinition prEPCPFDataset = new PrEPCTPregnantBreastfeedingDatasetDefinition();
+		prEPCPFDataset.addParameters(getParameters());
+		prEPCPFDataset.setEncounterType(followUpEncounter);
+		reportDefinition.addDataSetDefinition("Disaggregated by Pregnant/Breastfeeding",
+		    map(prEPCPFDataset, "startDate=${startDateGC},endDate=${endDateGC}"));
 		
 		return reportDefinition;
 	}

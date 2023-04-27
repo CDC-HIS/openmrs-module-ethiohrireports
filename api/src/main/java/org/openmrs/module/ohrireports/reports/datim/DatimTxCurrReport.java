@@ -7,11 +7,11 @@ import static org.openmrs.module.ohrireports.OHRIReportsConstants.HTS_FOLLOW_UP_
 import static org.openmrs.module.ohrireports.OHRIReportsConstants.DATIM_REPORT;
 
 import org.openmrs.api.context.Context;
-import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.TxCurrAutoCalculateDataSetDefinition;
-import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.TxCurrCoarseByAgeAndSexDataSetDefinition;
-import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.TxCurrFineByAgeAndSexDataSetDefinition;
-import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.TxCurrKeyPopulationTypeDataSetDefinition;
-import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.TxCurrARVDataSetDefinition;
+import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.tx_curr.TxCurrARVDataSetDefinition;
+import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.tx_curr.TxCurrAutoCalculateDataSetDefinition;
+import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.tx_curr.TxCurrCoarseByAgeAndSexDataSetDefinition;
+import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.tx_curr.TxCurrFineByAgeAndSexDataSetDefinition;
+import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.tx_curr.TxCurrKeyPopulationTypeDataSetDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.module.reporting.evaluation.parameter.Parameterizable;

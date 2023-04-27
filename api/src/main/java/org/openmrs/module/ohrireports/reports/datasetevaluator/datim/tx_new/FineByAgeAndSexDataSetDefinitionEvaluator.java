@@ -1,21 +1,17 @@
-package org.openmrs.module.ohrireports.reports.datasetevaluator.datim.pmtct_art;
+package org.openmrs.module.ohrireports.reports.datasetevaluator.datim.tx_new;
+
+import static org.openmrs.module.ohrireports.OHRIReportsConstants.ART_START_DATE;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static org.openmrs.module.ohrireports.OHRIReportsConstants.ART_START_DATE;
-import static org.openmrs.module.ohrireports.OHRIReportsConstants.TB_DIAGNOSTIC_TEST_RESULT;
-import static org.openmrs.module.ohrireports.OHRIReportsConstants.TREATMENT_END_DATE;
-import static org.openmrs.module.ohrireports.OHRIReportsConstants.TB_SCREENING_DATE;
-import static org.openmrs.module.ohrireports.OHRIReportsConstants.POSITIVE;
-
-import org.joda.time.chrono.IslamicChronology;
 import org.openmrs.Concept;
 import org.openmrs.Obs;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.ConceptService;
-import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.pmtct_art.PMTCTARTDataSetDefinition;
+import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.tx_new.AutoCalculateDataSetDefinition;
+import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.tx_new.FineByAgeAndSexDataSetDefinition;
 import org.openmrs.module.reporting.dataset.DataSet;
 import org.openmrs.module.reporting.dataset.DataSetColumn;
 import org.openmrs.module.reporting.dataset.DataSetRow;
@@ -28,51 +24,51 @@ import org.openmrs.module.reporting.evaluation.querybuilder.HqlQueryBuilder;
 import org.openmrs.module.reporting.evaluation.service.EvaluationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
-@Handler(supports = { PMTCTARTDataSetDefinition.class })
-public class PMTCTARTDataSetDefinitionEvaluator implements DataSetEvaluator {
+@Handler(supports = { FineByAgeAndSexDataSetDefinition.class })
+public class FineByAgeAndSexDataSetDefinitionEvaluator implements DataSetEvaluator {
 
     private EvaluationContext context;
+
+    private FineByAgeAndSexDataSetDefinition hdsd;
+    private Concept artConcept;
     private int total = 0;
-    private int minCount = 0;
-    private int maxCount = 4;
-    List<Obs> obses = new ArrayList<>();
-    private PMTCTARTDataSetDefinition hdsd;
-
-    private Concept artConcept, treatmentConcept, tbScreenDateConcept, tbDiagnosticTestResultConcept, positiveConcept;
-
     @Autowired
     private ConceptService conceptService;
 
     @Autowired
     private EvaluationService evaluationService;
+    private int minCount = 0;
+    private int maxCount = 4;
+    List<Obs> obses = new ArrayList<>();
 
     @Override
     public DataSet evaluate(DataSetDefinition dataSetDefinition, EvaluationContext evalContext)
             throws EvaluationException {
-        hdsd = (PMTCTARTDataSetDefinition) dataSetDefinition;
+        total = 0;
+        hdsd = (FineByAgeAndSexDataSetDefinition) dataSetDefinition;
         context = evalContext;
-        setRequiredConcepts();
-        SimpleDataSet simpleDataSet = new SimpleDataSet(dataSetDefinition, evalContext);
-        buildDataSet(simpleDataSet, true);
+        artConcept = conceptService.getConceptByUuid(ART_START_DATE);
+        SimpleDataSet set = new SimpleDataSet(dataSetDefinition, evalContext);
 
-        return simpleDataSet;
+        // Female aggregation
+        obses = LoadObs("F");
+        DataSetRow femaleDateSet = new DataSetRow();
+        buildDataSet(femaleDateSet, "F");
+        set.addRow(femaleDateSet);
 
-    }
-
-    private void buildDataSet(SimpleDataSet simpleDataSet, boolean isAlreadyOnArt) {
-        setObservations("F",isAlreadyOnArt);
-        DataSetRow femaleSetRow = new DataSetRow();
-        buildDataSet(femaleSetRow, "F");
-        simpleDataSet.addRow(femaleSetRow);
-
+        // Male aggregation
+        obses = LoadObs("M");
+        DataSetRow maleDataSet = new DataSetRow();
+        buildDataSet(maleDataSet, "M");
+        set.addRow(maleDataSet);
+        return set;
     }
 
     private void buildDataSet(DataSetRow dataSet, String gender) {
         total = 0;
         minCount = 1;
         maxCount = 4;
-
-        dataSet.addColumnValue(new DataSetColumn("ByAgeAndSexData", "Gender",
+        dataSet.addColumnValue(new DataSetColumn("FineByAgeAndSexData", "Gender",
                 Integer.class), gender.equals("F") ? "Female" : "Male");
         dataSet.addColumnValue(new DataSetColumn("unknownAge", "Unknown Age", Integer.class),
                 getEnrolledByUnknownAge());
@@ -82,7 +78,7 @@ public class PMTCTARTDataSetDefinitionEvaluator implements DataSetEvaluator {
 
         while (minCount <= 65) {
             if (minCount == 65) {
-                dataSet.addColumnValue(new DataSetColumn("65+", "65+", Integer.class),
+                dataSet.addColumnValue(new DataSetColumn("65+", "65", Integer.class),
                         getEnrolledByAgeAndGender(65, 200, gender));
             } else {
                 dataSet.addColumnValue(
@@ -161,54 +157,23 @@ public class PMTCTARTDataSetDefinitionEvaluator implements DataSetEvaluator {
         }
     }
 
-    private void setRequiredConcepts() {
-        artConcept = conceptService.getConceptByUuid(ART_START_DATE);
-        treatmentConcept = conceptService.getConceptByUuid(TREATMENT_END_DATE);
-        tbScreenDateConcept = conceptService.getConceptByUuid(TB_SCREENING_DATE);
-        tbDiagnosticTestResultConcept = conceptService.getConceptByUuid(TB_DIAGNOSTIC_TEST_RESULT);
-        positiveConcept = conceptService.getConceptByUuid(POSITIVE);
-    }
-
-    private void setObservations(String gender,boolean isAlreadyOnArt) {
+    private List<Obs> LoadObs(String gender) {
         HqlQueryBuilder queryBuilder = new HqlQueryBuilder();
-        queryBuilder.select("obs").from(Obs.class, "obs")
+        queryBuilder.select("obs")
+                .from(Obs.class, "obs")
                 .whereEqual("obs.encounter.encounterType", hdsd.getEncounterType())
                 .and()
                 .whereEqual("obs.person.gender", gender)
-                .whereEqual("obs.concept", artConcept).and();
-            if (!isAlreadyOnArt) {
-            queryBuilder.whereBetweenInclusive("obs.valueDatetime", hdsd.getStartDate(),
-             hdsd.getEndDate());
+                .and()
+                .whereEqual("obs.concept", artConcept)
+                .and()
+                .whereGreaterOrEqualTo("obs.valueDatetime", hdsd.getStartDate())
+                .and()
+                .whereLessOrEqualTo("obs.valueDatetime", hdsd.getEndDate())
+                .orderDesc("obs.obsDatetime");
 
-            }else {
-                queryBuilder.whereLess("obs.valueDatetime", hdsd.getStartDate());
-            }
-
-        queryBuilder.whereIdIn("obs.personId", getPregnantPatients());
-
-        obses = evaluationService.evaluateToList(queryBuilder, Obs.class, context);
-
+        List<Obs> obses = evaluationService.evaluateToList(queryBuilder, Obs.class, context);
+        return obses;
     }
 
-    private List<Integer> getOnTreatmentPatients() {
-        HqlQueryBuilder queryBuilder = new HqlQueryBuilder();
-        queryBuilder.select("distinct obs.personId").from(Obs.class, "obs")
-                .whereEqual("obs.encounter.encounterType", hdsd.getEncounterType()).and()
-                .whereEqual("obs.concept", treatmentConcept).and()
-                .whereGreater("obs.valueDatetime", hdsd.getStartDate());
-        return evaluationService.evaluateToList(queryBuilder, Integer.class, context);
-    }
-    
-
-    private List<Integer> getPregnantPatients() {
-        //TODO: update the query for the  pregnant patients
-        HqlQueryBuilder queryBuilder = new HqlQueryBuilder();
-        queryBuilder.select("obs").from(Obs.class, "obs")
-                .whereEqual("obs.encounter.encounterType", hdsd.getEncounterType())
-                .and().whereEqual("obs.concept", tbDiagnosticTestResultConcept).and()
-                .whereEqual("obs.valueCoded", positiveConcept)
-                .and().whereIdIn("obs.personId", getOnTreatmentPatients());
-        return evaluationService.evaluateToList(queryBuilder, Integer.class, context);
-
-    }
 }

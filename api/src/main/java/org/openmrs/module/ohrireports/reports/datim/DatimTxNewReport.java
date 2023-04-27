@@ -8,11 +8,11 @@ import static org.openmrs.module.ohrireports.OHRIReportsConstants.DATIM_REPORT;
 
 import org.openmrs.EncounterType;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.AutoCalculateDataSetDefinition;
-import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.BreastFeedingStatusDataSetDefinition;
-import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.CoarseByAgeAndSexDataSetDefinition;
-import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.FineByAgeAndSexDataSetDefinition;
-import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.PopulationTypeDataSetDefinition;
+import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.tx_new.AutoCalculateDataSetDefinition;
+import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.tx_new.BreastFeedingStatusDataSetDefinition;
+import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.tx_new.CoarseByAgeAndSexDataSetDefinition;
+import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.tx_new.FineByAgeAndSexDataSetDefinition;
+import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.tx_new.PopulationTypeDataSetDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.module.reporting.evaluation.parameter.Parameterizable;

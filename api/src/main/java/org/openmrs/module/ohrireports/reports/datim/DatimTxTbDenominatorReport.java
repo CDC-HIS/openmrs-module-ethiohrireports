@@ -7,11 +7,11 @@ import static org.openmrs.module.ohrireports.OHRIReportsConstants.HTS_FOLLOW_UP_
 import static org.openmrs.module.ohrireports.OHRIReportsConstants.*;
 
 import org.openmrs.api.context.Context;
-import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.TxTbDenominatorAutoCalculateDataSetDefinition;
-import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.TxTbDenominatorARTByAgeAndSexDataSetDefinition;
-import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.TxTbDenominatorSpecimenSentDataSetDefinition;
-import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.TxTbDenominatorPositiveResultReturnedDataSetDefinition;
-import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.TxTbDenominatorDiagnosticTestDataSetDefinition;
+import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.tx_tb_denominator.TxTbDenominatorARTByAgeAndSexDataSetDefinition;
+import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.tx_tb_denominator.TxTbDenominatorAutoCalculateDataSetDefinition;
+import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.tx_tb_denominator.TxTbDenominatorDiagnosticTestDataSetDefinition;
+import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.tx_tb_denominator.TxTbDenominatorPositiveResultReturnedDataSetDefinition;
+import org.openmrs.module.ohrireports.reports.datasetdefinition.datim.tx_tb_denominator.TxTbDenominatorSpecimenSentDataSetDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.module.reporting.evaluation.parameter.Parameterizable;
