@@ -1,12 +1,13 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>org.openmrs.maven.parents</groupId>
-        <artifactId>maven-parent-openmrs-module</artifactId>
-        <version>1.1.1</version>
-    </parent>
+	<parent>
+		<groupId>org.openmrs.maven.parents</groupId>
+		<artifactId>maven-parent-openmrs-module</artifactId>
+		<version>1.1.1</version>
+	</parent>
 
 	<groupId>org.openmrs.module</groupId>
 	<artifactId>ethiohri-reports</artifactId>
@@ -115,6 +116,12 @@
 				<version>${cohortVersion}</version>
 				<scope>provided</scope>
 			</dependency>
+			<dependency>
+				<groupId>org.openmrs.ohri</groupId>
+				<artifactId>ohri-mamba-core</artifactId>
+				<version>1.0.0-SNAPSHOT</version>
+			</dependency>
+
 		</dependencies>
 	</dependencyManagement>
 
@@ -149,13 +156,145 @@
 						<tagNameFormat>v@{project.version}</tagNameFormat>
 					</configuration>
 				</plugin>
+				 <!-- 1. Unpack the dependency jar first -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <version>3.2.0</version>
+                    <executions>
+                        <execution>
+                            <id>unpack-scripts</id>
+                            <phase>prepare-package</phase>
+                            <goals>
+                                <goal>unpack</goal>
+                            </goals>
+                            <configuration>
+                                <artifactItems>
+                                    <artifactItem>
+                                        <groupId>org.openmrs.ohri</groupId>
+                                        <artifactId>ohri-mamba-core</artifactId>
+                                        <version>1.0.0-SNAPSHOT</version>
+                                        <type>jar</type>
+                                        <outputDirectory>${project.build.directory}/mamba-etl</outputDirectory>
+                                        <includes>_core/**</includes>
+                                    </artifactItem>
+                                </artifactItems>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+  <!-- Step 2 & the last step-->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>3.2.0</version>
+                    <executions>
+
+                        <!-- 2. Copy contents of the resources directory of the dependency jar to a target location -->
+                        <execution>
+                            <id>copy-scripts</id>
+                            <phase>prepare-package</phase>
+                            <goals>
+                                <goal>copy-resources</goal>
+                            </goals>
+                            <configuration>
+                                <resources>
+                                    <resource>
+                                        <directory>${project.basedir}/src/main/resources/_etl</directory>
+                                        <filtering>true</filtering>
+                                    </resource>
+                                </resources>
+                                <outputDirectory>${project.build.directory}/mamba-etl/_etl</outputDirectory>
+                            </configuration>
+                        </execution>
+
+                        <!-- This should execute last - to copy the build script to a location liquibase.xml can access-->
+                        <execution>
+                            <id>copy-final-build-script</id>
+                            <phase>install</phase>
+                            <goals>
+                                <goal>copy-resources</goal>
+                            </goals>
+                            <configuration>
+                                <resources>
+                                    <resource>
+                                        <directory>
+                                            ${project.build.directory}/mamba-etl/_core/database/mysql/build
+                                        </directory>
+                                        <filtering>true</filtering>
+                                    </resource>
+                                </resources>
+                                <outputDirectory>${project.parent.basedir}/api/src/main/resources/mamba
+                                </outputDirectory>
+                            </configuration>
+                        </execution>
+
+                    </executions>
+                </plugin>
+  <!-- 3. Make the compiler scripts executable & then run the compiler -->
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>exec-maven-plugin</artifactId>
+                    <version>3.0.0</version>
+                    <executions>
+
+                        <execution>
+                            <id>set-executable-permission</id>
+                            <phase>prepare-package</phase>
+                            <goals>
+                                <goal>exec</goal>
+                            </goals>
+                            <configuration>
+                                <executable>/bin/sh</executable>
+                                <arguments>
+                                    <argument>-c</argument>
+                                    <argument>chmod -R +x ${project.build.directory}/mamba-etl/_core/compiler</argument>
+                                </arguments>
+                            </configuration>
+                        </execution>
+
+                        <execution>
+                            <id>run-script</id>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>exec</goal>
+                            </goals>
+                            <configuration>
+                                <executable>/bin/sh</executable>
+                                <workingDirectory>${project.build.directory}/mamba-etl/_core/compiler/linux
+                                </workingDirectory>
+                                <arguments>
+                                    <!-- the Engine compiler script -->
+                                    <argument>compile.sh</argument>
+                                    <!-- Database the created stored procedures will run on -->
+                                    <argument>-d openmrs_working</argument>
+                                    <!-- File with a list of all files with stored procedures -->
+                                    <!-- Remove this argument after automating core to auto-read this -->
+                                    <argument>-s ../../database/mysql/sp_makefile</argument>
+                                    <!-- a JSON configuration path/folder for all config files for db flattening -->
+                                    <!-- Folder containing configs folder, derived folders and any other ETL related folders -->
+                                    <argument>-t ${project.build.directory}/mamba-etl/_etl/config</argument>
+                                    <!-- Database Vendor/Engine targeted in this ETL -->
+                                    <argument>-n mysql</argument>
+                                    <!-- add any other arguments below -->
+                                    <argument></argument>
+                                    <argument></argument>
+                                    <argument></argument>
+                                    <argument></argument>
+                                </arguments>
+                            </configuration>
+                        </execution>
+
+                    </executions>
+                </plugin>
+
 			</plugins>
 		</pluginManagement>
 
 	</build>
-
-    <properties>
-        <openmrsPlatformVersion>2.1.1</openmrsPlatformVersion>
+ 
+	<properties>
+		<openmrsPlatformVersion>2.3.1</openmrsPlatformVersion>
 		<reportingVersion>1.19.0</reportingVersion>
 		<cohortVersion>3.0.0-SNAPSHOT</cohortVersion>
 	</properties>

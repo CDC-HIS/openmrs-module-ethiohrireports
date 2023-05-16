@@ -18,6 +18,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import javax.persistence.EntityManager;
+import javax.persistence.StoredProcedureQuery;
+
 import org.openmrs.Concept;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
@@ -43,6 +46,8 @@ import org.openmrs.module.reporting.evaluation.querybuilder.HqlQueryBuilder;
 import org.openmrs.module.reporting.evaluation.service.EvaluationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import groovy.xml.Entity;
+
 @Handler(supports = { TXCurrDataSetDefinition.class })
 public class TXCurrDataSetDefinitionEvaluator implements DataSetEvaluator {
 
@@ -54,6 +59,9 @@ public class TXCurrDataSetDefinitionEvaluator implements DataSetEvaluator {
 
 	@Autowired
 	PatientService patientService;
+
+	@Autowired
+	private EntityManager entityManager;
 
 	private TXCurrDataSetDefinition hdsd;
 	private EvaluationContext context;
@@ -67,6 +75,7 @@ public class TXCurrDataSetDefinitionEvaluator implements DataSetEvaluator {
 		context = evalContext;
 		SimpleDataSet data = new SimpleDataSet(dataSetDefinition, evalContext);
 
+		StoredProcedureQuery query = Entity.
 		List<Obs> obsList = getTxCurrPatients();
 
 		DataSetRow row = null;

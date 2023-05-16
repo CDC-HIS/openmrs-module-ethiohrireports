@@ -35,5 +35,14 @@
         <addForeignKeyConstraint constraintName="ohrireports_item_owner_fk" baseTableName="ohrireports_item" baseColumnNames="owner"  referencedTableName="users"
                                  referencedColumnNames="user_id" />
     </changeSet> -->
- 
+ <changeSet id="ohri-mamba-setup0001" author="Arthur D. Mugume [OHRI]" runAlways="true">
+
+        <comment>
+            Installs/deploys all the required Mamba ETL Stored procedures and functions
+        </comment>
+
+        <sqlFile splitStatements="true" stripComments="true" endDelimiter="~"
+                 path="mamba/liquibase_create_stored_procedures.sql"/>
+
+    </changeSet>
 </databaseChangeLog>

@@ -1,0 +1,10 @@
+{
+  "report_name": "follow_up",
+  "flat_table_name": "mamba_flat_encounter_follow_up",
+  "encounter_type_uuid": "136b2ded-22a3-4831-a39a-088d35a50ef5",
+  "table_columns": {
+    "patient_status":"160433AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+    "regiment":"6d7d0327-e1f8-4246-bfe5-be1e82d94b14",
+    "treatment_end_date":"164384AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+  }
+}
