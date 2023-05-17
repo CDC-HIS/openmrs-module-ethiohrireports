@@ -1,14 +1,13 @@
 package org.openmrs.module.ohrireports.reports.datasetevaluator;
 
 import static org.openmrs.module.ohrireports.OHRIReportsConstants.ALIVE;
+import static org.openmrs.module.ohrireports.OHRIReportsConstants.MRN_PATIENT_IDENTIFIERS;
+import static org.openmrs.module.ohrireports.OHRIReportsConstants.OPENMRS_PATIENT_IDENTIFIERS;
 import static org.openmrs.module.ohrireports.OHRIReportsConstants.PATIENT_STATUS;
 import static org.openmrs.module.ohrireports.OHRIReportsConstants.REGIMEN;
 import static org.openmrs.module.ohrireports.OHRIReportsConstants.RESTART;
-import static org.openmrs.module.ohrireports.OHRIReportsConstants.MRN_PATIENT_IDENTIFIERS;
 import static org.openmrs.module.ohrireports.OHRIReportsConstants.TREATMENT_END_DATE;
-import static org.openmrs.module.ohrireports.OHRIReportsConstants.OPENMRS_PATIENT_IDENTIFIERS;
 
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -18,22 +17,18 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import javax.persistence.EntityManager;
-import javax.persistence.StoredProcedureQuery;
-
+import org.hibernate.SQLQuery;
+import org.hibernate.type.StandardBasicTypes;
 import org.openmrs.Concept;
 import org.openmrs.Obs;
-import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.Person;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.PatientService;
-import org.openmrs.module.ohrireports.helper.EthiopianDate;
-import org.openmrs.module.ohrireports.helper.EthiopianDateConverter;
+import org.openmrs.api.db.hibernate.DbSessionFactory;
 import org.openmrs.module.ohrireports.reports.datasetdefinition.TXCurrDataSetDefinition;
-import org.openmrs.module.reporting.data.patient.definition.PatientObjectDataDefinition;
 import org.openmrs.module.reporting.dataset.DataSet;
 import org.openmrs.module.reporting.dataset.DataSetColumn;
 import org.openmrs.module.reporting.dataset.DataSetRow;
@@ -46,8 +41,6 @@ import org.openmrs.module.reporting.evaluation.querybuilder.HqlQueryBuilder;
 import org.openmrs.module.reporting.evaluation.service.EvaluationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import groovy.xml.Entity;
-
 @Handler(supports = { TXCurrDataSetDefinition.class })
 public class TXCurrDataSetDefinitionEvaluator implements DataSetEvaluator {
 
@@ -59,11 +52,11 @@ public class TXCurrDataSetDefinitionEvaluator implements DataSetEvaluator {
 
 	@Autowired
 	PatientService patientService;
-
 	@Autowired
-	private EntityManager entityManager;
+	private DbSessionFactory sessionFactory;
 
 	private TXCurrDataSetDefinition hdsd;
+
 	private EvaluationContext context;
 	HashMap<Integer, Concept> patientStatus = new HashMap<>();
 
@@ -75,7 +68,6 @@ public class TXCurrDataSetDefinitionEvaluator implements DataSetEvaluator {
 		context = evalContext;
 		SimpleDataSet data = new SimpleDataSet(dataSetDefinition, evalContext);
 
-		StoredProcedureQuery query = Entity.
 		List<Obs> obsList = getTxCurrPatients();
 
 		DataSetRow row = null;
@@ -84,64 +76,54 @@ public class TXCurrDataSetDefinitionEvaluator implements DataSetEvaluator {
 		PatientIdentifierType openmrsIdentifierType = patientService
 				.getPatientIdentifierTypeByUuid(OPENMRS_PATIENT_IDENTIFIERS);
 
-		for (Obs obses : obsList) {
+		List<Object[]> resultSet = getEtlCurr();
 
-			Person person = obses.getPerson();
-			// row should be filled with only patient data
-			if (!person.getIsPatient())
-				continue;
+		for (Object[] objects : resultSet) {
 
-			Patient patient = patientService.getPatient(person.getId());
-			
-			
-			Concept status = patientStatus.get(person.getId());
-			EthiopianDate ethiopianDate = null;
+			// EthiopianDate ethiopianDate = null;
 			try {
-				ethiopianDate = EthiopianDateConverter
-						.ToEthiopianDate(obses.getValueDate()
-						.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
-			
-			row = new DataSetRow();
-			row.addColumnValue(new DataSetColumn("MRN", "MRN", String.class),
-			getStringIdentifier(patient.getPatientIdentifier(mrnIdentifierType)));
-			
-			row.addColumnValue(new DataSetColumn("OpenMrs", "Openmrs ID", String.class),
-			getStringIdentifier(patient.getPatientIdentifier(openmrsIdentifierType)) );
-			
-			row.addColumnValue(new DataSetColumn("Name", "Name", String.class), person.getNames());
-			
-			row.addColumnValue(new DataSetColumn("Age", "Age", Integer.class), person.getAge());
-			
-			row.addColumnValue(new DataSetColumn("Gender", "Gender", String.class), person.getGender());
-			
-			row.addColumnValue(new DataSetColumn("TreatmentEndDate", "Treatment End Date",
-					Date.class), obses.getValueDate());
-			row.addColumnValue(new DataSetColumn("TreatmentEndDateETC", "Treatment End Date ETH",
-					String.class),
-					ethiopianDate.equals(null) ? ""
-							: ethiopianDate.getDay() + "/" + ethiopianDate.getMonth() + "/" + ethiopianDate.getYear());
-			row.addColumnValue(new DataSetColumn("Regimen", "Regmin", String.class), getRegimen(obses, evalContext));
-			
-			row.addColumnValue(new DataSetColumn("Status", "Status",
-					String.class),
-					Objects.isNull(status) || Objects.isNull(status.getName()) ? "" : status.getName().getName());
-			data.addRow(row);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+				// ethiopianDate = EthiopianDateConverter
+				// .ToEthiopianDate(DateTime.parse(objects[2]
+				// .toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+
+				row = new DataSetRow();
+				row.addColumnValue(new DataSetColumn("Status", "Status",
+						String.class),
+						Objects.isNull(objects[0]) || Objects.isNull(objects[0]) ? "" : objects[0].toString());
+
+				row.addColumnValue(new DataSetColumn("Regimen", "Regmin", String.class),
+						objects[1]);
+
+				row.addColumnValue(new DataSetColumn("TreatmentEndDate", "Treatment End Date",
+						Date.class), objects[2]);
+				// row.addColumnValue(new DataSetColumn("TreatmentEndDateETC", "Treatment End
+				// Date ETH",
+				// String.class),
+				// ethiopianDate.equals(null) ? ""
+				// : ethiopianDate.getDay() + "/" + ethiopianDate.getMonth() + "/"
+				// + ethiopianDate.getYear());
+
+				data.addRow(row);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 
 		}
 		return data;
 	}
 
-	
-
 	private String getStringIdentifier(PatientIdentifier patientIdentifier) {
-		return Objects.isNull(patientIdentifier)?"--":patientIdentifier.getIdentifier();
+		return Objects.isNull(patientIdentifier) ? "--" : patientIdentifier.getIdentifier();
 	}
 
+	public DbSessionFactory getSessionFactory() {
+		return sessionFactory;
+	}
 
+	public void setSessionFactory(DbSessionFactory sessionFactory) {
+		this.sessionFactory = sessionFactory;
+	}
 
 	private List<Obs> getTxCurrPatients() {
 
@@ -175,6 +157,19 @@ public class TXCurrDataSetDefinitionEvaluator implements DataSetEvaluator {
 		return obseList;
 	}
 
+	private List<Object[]> getEtlCurr() {
+		SQLQuery txCurrQuery = sessionFactory.getCurrentSession()
+				.createSQLQuery("CALL sp_fact_tx_curr_query(:art_end_date)");
+
+		txCurrQuery.setParameter("art_end_date", hdsd.getEndDate());
+		txCurrQuery.addScalar("patient_status", StandardBasicTypes.STRING);
+		txCurrQuery.addScalar("regiment", StandardBasicTypes.STRING);
+		txCurrQuery.addScalar("treatment_end_date", StandardBasicTypes.DATE);
+
+		List<Object[]> txCurrResult = txCurrQuery.list();
+		return txCurrResult;
+	}
+
 	private List<Integer> getListOfALiveORRestartPatients() {
 
 		List<Concept> concepts = Arrays.asList(conceptService.getConceptByUuid(ALIVE),
@@ -192,17 +187,16 @@ public class TXCurrDataSetDefinitionEvaluator implements DataSetEvaluator {
 				.whereIn("obv.valueCoded", concepts);
 
 		Set<Integer> patients = new LinkedHashSet<>();
-		List<Obs> obsList=  evaluationService.evaluateToList(queryBuilder, Obs.class, context);
-		//Removing duplicate using HashSet
-		 for (Obs obs : obsList) {
-			if(patients.add(obs.getPersonId()))
-			{
-				//updating 
+		List<Obs> obsList = evaluationService.evaluateToList(queryBuilder, Obs.class, context);
+		// Removing duplicate using HashSet
+		for (Obs obs : obsList) {
+			if (patients.add(obs.getPersonId())) {
+				// updating
 				patientStatus.put(obs.getPersonId(), obs.getValueCoded());
 			}
-		 }
-		
-		 return new ArrayList<Integer>(patients);
+		}
+
+		return new ArrayList<Integer>(patients);
 	}
 
 	private String getRegimen(Obs obs, EvaluationContext context) {

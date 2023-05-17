@@ -13,9 +13,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.BaseModuleActivator;
+import org.openmrs.module.ohrireports.api.task.FlattenTableTask;
 import org.openmrs.module.ohrireports.cohorts.util.HtsStaticCohortsUtil;
 import org.openmrs.module.reporting.report.manager.ReportManager;
 import org.openmrs.module.reporting.report.manager.ReportManagerUtil;
+import org.openmrs.scheduler.SchedulerService;
+import org.openmrs.scheduler.TaskDefinition;
 
 import static org.openmrs.module.ohrireports.cohorts.manager.CohortDefinitionManagerUtil.setUpCohortsDefinitions;
 
@@ -31,6 +34,12 @@ public class OHRIReportsActivator extends BaseModuleActivator {
 	 */
 	public void started() {
 		log.info("Started ETHIOHRI Reports");
+		String taskName = "Mamba - database Flattening Task";
+		Long repeatInterval = 300L; //second
+		String taskClassName = FlattenTableTask.class.getName();
+		String description = "Mamba - Flatten the OpenMRS data-models (Database) Task";
+		
+		addTask(taskName, taskClassName, repeatInterval, description);
 		setUpCohortsDefinitions();
 		
 		for (ReportManager reportManager : Context.getRegisteredComponents(ReportManager.class)) {
@@ -47,6 +56,19 @@ public class OHRIReportsActivator extends BaseModuleActivator {
 	 */
 	public void shutdown() {
 		log.info("Shutdown ETHIOHRI Reports");
+	}
+	
+	void addTask(String name, String className, Long repeatInterval, String description) {
+		
+		SchedulerService scheduler = Context.getSchedulerService();
+		TaskDefinition taskDefinition = scheduler.getTaskByName(name);
+		if (taskDefinition == null) {
+			
+			taskDefinition = new TaskDefinition(null, name, description, className);
+			taskDefinition.setStartOnStartup(Boolean.TRUE);
+			taskDefinition.setRepeatInterval(repeatInterval);
+			scheduler.saveTaskDefinition(taskDefinition);
+		}
 	}
 	
 }

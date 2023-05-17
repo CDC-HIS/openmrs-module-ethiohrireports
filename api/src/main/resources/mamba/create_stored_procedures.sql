@@ -1,22 +1,70 @@
 
+        
+    
+        
+-- ---------------------------------------------------------------------------------------------
+-- ----------------------  fn_calculate_agegroup  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
+DELIMITER //
+
+DROP FUNCTION IF EXISTS fn_calculate_agegroup;
+
+CREATE FUNCTION fn_calculate_agegroup(age INT) RETURNS VARCHAR(15)
+    DETERMINISTIC
+BEGIN
+    DECLARE agegroup VARCHAR(15);
+    IF (age < 1) THEN
+        SET agegroup = '<1';
+    ELSEIF age between 1 and 4 THEN
+        SET agegroup = '1-4';
+    ELSEIF age between 5 and 9 THEN
+        SET agegroup = '5-9';
+    ELSEIF age between 10 and 14 THEN
+        SET agegroup = '10-14';
+    ELSEIF age between 15 and 19 THEN
+        SET agegroup = '15-19';
+    ELSEIF age between 20 and 24 THEN
+        SET agegroup = '20-24';
+    ELSEIF age between 25 and 29 THEN
+        SET agegroup = '25-29';
+    ELSEIF age between 30 and 34 THEN
+        SET agegroup = '30-34';
+    ELSEIF age between 35 and 39 THEN
+        SET agegroup = '35-39';
+    ELSEIF age between 40 and 44 THEN
+        SET agegroup = '40-44';
+    ELSEIF age between 45 and 49 THEN
+        SET agegroup = '45-49';
+    ELSEIF age between 50 and 54 THEN
+        SET agegroup = '50-54';
+    ELSEIF age between 55 and 59 THEN
+        SET agegroup = '55-59';
+    ELSEIF age between 60 and 64 THEN
+        SET agegroup = '60-64';
+    ELSE
+        SET agegroup = '65+';
+    END IF;
+
+    RETURN (agegroup);
+END //
+
+DELIMITER ;
 
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- fn_get_obs_value_column
---
+-- ----------------------  fn_get_obs_value_column  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
 DROP FUNCTION IF EXISTS fn_get_obs_value_column;
 
-CREATE FUNCTION fn_get_obs_value_column(conceptDatatype CHAR(20) CHARACTER SET UTF8MB4) RETURNS CHAR(20) CHARACTER SET UTF8MB4
+CREATE FUNCTION fn_get_obs_value_column(conceptDatatype VARCHAR(20)) RETURNS VARCHAR(20)
     DETERMINISTIC
 BEGIN
-    DECLARE obsValueColumn VARCHAR(20) CHARACTER SET UTF8MB4;
-
+    DECLARE obsValueColumn VARCHAR(20);
     IF (conceptDatatype = 'Text' OR conceptDatatype = 'Coded' OR conceptDatatype = 'N/A' OR
         conceptDatatype = 'Boolean') THEN
         SET obsValueColumn = 'obs_value_text';
@@ -33,10 +81,9 @@ DELIMITER ;
 
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_xf_system_drop_all_functions_in_schema
---
+-- ----------------------  sp_xf_system_drop_all_functions_in_schema  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -54,10 +101,9 @@ DELIMITER ;
 
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_xf_system_drop_all_stored_procedures_in_schema
---
+-- ----------------------  sp_xf_system_drop_all_stored_procedures_in_schema  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -76,10 +122,9 @@ DELIMITER ;
 
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_xf_system_drop_all_objects_in_schema
---
+-- ----------------------  sp_xf_system_drop_all_objects_in_schema  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -91,7 +136,7 @@ CREATE PROCEDURE sp_xf_system_drop_all_objects_in_schema(
 BEGIN
 
     CALL sp_xf_system_drop_all_stored_functions_in_schema(database_name);
-    CALL sp_xf_system_drop_all_stored_procedures_in_schema (database_name);
+    CALL sp_xf_system_drop_all_stored_procedures_in_schema(database_name);
     CALL sp_xf_system_drop_all_tables_in_schema(database_name);
     # CALL sp_xf_system_drop_all_views_in_schema (database_name);
 
@@ -101,36 +146,36 @@ DELIMITER ;
 
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_xf_system_drop_all_tables_in_schema
---
+-- ----------------------  sp_xf_system_drop_all_tables_in_schema  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
 DROP PROCEDURE IF EXISTS sp_xf_system_drop_all_tables_in_schema;
 
-CREATE PROCEDURE sp_xf_system_drop_all_tables_in_schema(
-    IN database_name CHAR(255) CHARACTER SET UTF8MB4
-)
+-- CREATE PROCEDURE sp_xf_system_drop_all_tables_in_schema(IN database_name CHAR(255) CHARACTER SET UTF8MB4)
+CREATE PROCEDURE sp_xf_system_drop_all_tables_in_schema()
 BEGIN
 
     DECLARE tables_count INT;
+
+    SET @database_name = (SELECT DATABASE());
 
     SELECT COUNT(1)
     INTO tables_count
     FROM information_schema.tables
     WHERE TABLE_TYPE = 'BASE TABLE'
-      AND TABLE_SCHEMA = database_name;
+      AND TABLE_SCHEMA = @database_name;
 
     IF tables_count > 0 THEN
 
         SET session group_concat_max_len = 20000;
 
-        SET @tbls = (SELECT GROUP_CONCAT(database_name, '.', TABLE_NAME SEPARATOR ', ')
+        SET @tbls = (SELECT GROUP_CONCAT(@database_name, '.', TABLE_NAME SEPARATOR ', ')
                      FROM information_schema.tables
                      WHERE TABLE_TYPE = 'BASE TABLE'
-                       AND TABLE_SCHEMA = database_name
+                       AND TABLE_SCHEMA = @database_name
                        AND TABLE_NAME REGEXP '^(mamba_|dim_|fact_|flat_)');
 
         IF (@tbls IS NOT NULL) THEN
@@ -153,10 +198,9 @@ DELIMITER ;
 
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_xf_system_execute_etl
---
+-- ----------------------  sp_xf_system_execute_etl  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -171,7 +215,7 @@ BEGIN
     -- Fix start time in microseconds
     SET @start_time = (UNIX_TIMESTAMP(NOW()) * 1000000 + MICROSECOND(NOW(6)));
 
-    call sp_data_processing();
+    call sp_data_processing_etl();
 
     -- Fix end time in microseconds
     SET @end_time = (UNIX_TIMESTAMP(NOW()) * 1000000 + MICROSECOND(NOW(6)));
@@ -185,10 +229,9 @@ DELIMITER ;
 
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_flat_encounter_table_create
---
+-- ----------------------  sp_flat_encounter_table_create  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -204,12 +247,14 @@ BEGIN
 
     SET @drop_table = CONCAT('DROP TABLE IF EXISTS `', flat_encounter_table_name, '`');
 
-    SELECT GROUP_CONCAT(column_label SEPARATOR ' TEXT, ') INTO @column_labels
-                     FROM mamba_dim_concept_metadata
-                     WHERE flat_table_name = flat_encounter_table_name;
+    SELECT GROUP_CONCAT(column_label SEPARATOR ' TEXT, ')
+    INTO @column_labels
+    FROM mamba_dim_concept_metadata
+    WHERE flat_table_name = flat_encounter_table_name;
 
     SET @create_table = CONCAT(
-            'CREATE TABLE `', flat_encounter_table_name ,'` (encounter_id INT, client_id INT, ', @column_labels, ' TEXT);');
+            'CREATE TABLE `', flat_encounter_table_name, '` (encounter_id INT, client_id INT, ', @column_labels,
+            ' TEXT);');
 
     PREPARE deletetb FROM @drop_table;
     PREPARE createtb FROM @create_table;
@@ -226,10 +271,9 @@ DELIMITER ;
 
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_flat_encounter_table_create_all
---
+-- ----------------------  sp_flat_encounter_table_create_all  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 -- Flatten all Encounters given in Config folder
 DELIMITER //
@@ -268,10 +312,9 @@ DELIMITER ;
 
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_flat_encounter_table_insert
---
+-- ----------------------  sp_flat_encounter_table_insert  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -286,20 +329,20 @@ BEGIN
     SET @tbl_name = flat_encounter_table_name;
 
     SET @old_sql = (SELECT GROUP_CONCAT(COLUMN_NAME SEPARATOR ', ')
-                          FROM INFORMATION_SCHEMA.COLUMNS
-                          WHERE TABLE_NAME = @tbl_name
-                            AND TABLE_SCHEMA = Database());
+                    FROM INFORMATION_SCHEMA.COLUMNS
+                    WHERE TABLE_NAME = @tbl_name
+                      AND TABLE_SCHEMA = Database());
 
-    SELECT
-      GROUP_CONCAT(DISTINCT
-        CONCAT(' MAX(CASE WHEN column_label = ''', column_label, ''' THEN ', fn_get_obs_value_column(concept_datatype), ' END) ', column_label)
-      ORDER BY concept_metadata_id ASC)
+    SELECT GROUP_CONCAT(DISTINCT
+                        CONCAT(' MAX(CASE WHEN column_label = ''', column_label, ''' THEN ',
+                               fn_get_obs_value_column(concept_datatype), ' END) ', column_label)
+                        ORDER BY concept_metadata_id ASC)
     INTO @column_labels
     FROM mamba_dim_concept_metadata
-         WHERE flat_table_name = @tbl_name;
+    WHERE flat_table_name = @tbl_name;
 
     SET @insert_stmt = CONCAT(
-            'INSERT INTO `', @tbl_name ,'` SELECT eo.encounter_id, eo.person_id, ', @column_labels, '
+            'INSERT INTO `', @tbl_name, '` SELECT eo.encounter_id, eo.person_id, ', @column_labels, '
             FROM mamba_z_encounter_obs eo
                 INNER JOIN mamba_dim_concept_metadata cm
                 ON IF(cm.concept_answer_obs=1, cm.concept_uuid=eo.obs_value_coded_uuid, cm.concept_uuid=eo.obs_question_uuid)
@@ -317,10 +360,9 @@ DELIMITER ;
 
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_flat_encounter_table_insert_all
---
+-- ----------------------  sp_flat_encounter_table_insert_all  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 -- Flatten all Encounters given in Config folder
 DELIMITER //
@@ -359,20 +401,19 @@ DELIMITER ;
 
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_multiselect_values_update
---
+-- ----------------------  sp_multiselect_values_update  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
 DROP PROCEDURE IF EXISTS `sp_multiselect_values_update`;
 
 CREATE PROCEDURE `sp_multiselect_values_update`(
-        IN table_to_update CHAR(100) CHARACTER SET UTF8MB4,
-        IN column_names TEXT CHARACTER SET UTF8MB4,
-        IN value_yes CHAR(100) CHARACTER SET UTF8MB4,
-        IN value_no CHAR(100) CHARACTER SET UTF8MB4
+    IN table_to_update CHAR(100) CHARACTER SET UTF8MB4,
+    IN column_names TEXT CHARACTER SET UTF8MB4,
+    IN value_yes CHAR(100) CHARACTER SET UTF8MB4,
+    IN value_no CHAR(100) CHARACTER SET UTF8MB4
 )
 BEGIN
 
@@ -394,8 +435,9 @@ BEGIN
 
         -- UPDATE fact_hts SET @column_label=IF(@column_label IS NULL OR '', new_value_if_false, new_value_if_true);
 
-         SET @update_sql = CONCAT(
-             'UPDATE ', table_to_update ,' SET ', @column_label ,'= IF(', @column_label ,' IS NOT NULL, ''',value_yes,''', ''',value_no,''');');
+        SET @update_sql = CONCAT(
+                'UPDATE ', table_to_update, ' SET ', @column_label, '= IF(', @column_label, ' IS NOT NULL, ''',
+                value_yes, ''', ''', value_no, ''');');
         PREPARE stmt FROM @update_sql;
         EXECUTE stmt;
         DEALLOCATE PREPARE stmt;
@@ -404,9 +446,8 @@ BEGIN
             SET @table_columns = substring(@table_columns, @comma_pos + 1);
             SET @comma_pos = locate(',', @table_columns);
         END IF;
-        UNTIL @end_loop = 1
-
-    END REPEAT;
+    UNTIL @end_loop = 1
+        END REPEAT;
 
 END //
 
@@ -414,10 +455,9 @@ DELIMITER ;
 
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_extract_report_metadata
---
+-- ----------------------  sp_extract_report_metadata  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -476,10 +516,32 @@ DELIMITER ;
 
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_mamba_dim_concept_datatype_create
---
+-- ----------------------  sp_load_agegroup  ----------------------------
+-- ---------------------------------------------------------------------------------------------
+
+DELIMITER //
+
+DROP PROCEDURE IF EXISTS sp_load_agegroup;
+
+CREATE PROCEDURE sp_load_agegroup()
+BEGIN
+    DECLARE age INT DEFAULT 0;
+    WHILE age <= 120
+        DO
+            INSERT INTO dim_agegroup(age, datim_agegroup, normal_agegroup)
+            VALUES (age, fn_calculate_agegroup(age), IF(age < 15, '<15', '15+'));
+            SET age = age + 1;
+        END WHILE;
+END //
+
+DELIMITER ;
+
+
+        
+-- ---------------------------------------------------------------------------------------------
+-- ----------------------  sp_mamba_dim_concept_datatype_create  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -489,10 +551,11 @@ CREATE PROCEDURE sp_mamba_dim_concept_datatype_create()
 BEGIN
 -- $BEGIN
 
-CREATE TABLE mamba_dim_concept_datatype (
-    concept_datatype_id int NOT NULL AUTO_INCREMENT,
+CREATE TABLE mamba_dim_concept_datatype
+(
+    concept_datatype_id  int                             NOT NULL AUTO_INCREMENT,
     external_datatype_id int,
-    datatype_name CHAR(255) CHARACTER SET UTF8MB4 NULL,
+    datatype_name        CHAR(255) CHARACTER SET UTF8MB4 NULL,
     PRIMARY KEY (concept_datatype_id)
 );
 
@@ -506,10 +569,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_mamba_dim_concept_datatype_insert
---
+-- ----------------------  sp_mamba_dim_concept_datatype_insert  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -519,17 +581,12 @@ CREATE PROCEDURE sp_mamba_dim_concept_datatype_insert()
 BEGIN
 -- $BEGIN
 
-INSERT INTO mamba_dim_concept_datatype (
-    external_datatype_id,
-    datatype_name
-)
-SELECT
-    dt.concept_datatype_id AS external_datatype_id,
-    dt.name AS datatype_name
-FROM
-    concept_datatype dt
-WHERE
-    dt.retired = 0;
+INSERT INTO mamba_dim_concept_datatype (external_datatype_id,
+                                        datatype_name)
+SELECT dt.concept_datatype_id AS external_datatype_id,
+       dt.name                AS datatype_name
+FROM concept_datatype dt
+WHERE dt.retired = 0;
 
 -- $END
 END //
@@ -537,10 +594,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_mamba_dim_concept_datatype
---
+-- ----------------------  sp_mamba_dim_concept_datatype  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -559,10 +615,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_mamba_dim_concept_create
---
+-- ----------------------  sp_mamba_dim_concept_create  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -594,10 +649,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_mamba_dim_concept_insert
---
+-- ----------------------  sp_mamba_dim_concept_insert  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -622,10 +676,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_mamba_dim_concept_update
---
+-- ----------------------  sp_mamba_dim_concept_update  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -647,10 +700,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_mamba_dim_concept
---
+-- ----------------------  sp_mamba_dim_concept  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -670,10 +722,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_mamba_dim_concept_answer_create
---
+-- ----------------------  sp_mamba_dim_concept_answer_create  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -683,11 +734,12 @@ CREATE PROCEDURE sp_mamba_dim_concept_answer_create()
 BEGIN
 -- $BEGIN
 
-CREATE TABLE mamba_dim_concept_answer (
+CREATE TABLE mamba_dim_concept_answer
+(
     concept_answer_id INT NOT NULL AUTO_INCREMENT,
-    concept_id INT,
-    answer_concept INT,
-    answer_drug INT,
+    concept_id        INT,
+    answer_concept    INT,
+    answer_drug       INT,
     PRIMARY KEY (concept_answer_id)
 );
 
@@ -697,10 +749,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_mamba_dim_concept_answer_insert
---
+-- ----------------------  sp_mamba_dim_concept_answer_insert  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -710,17 +761,13 @@ CREATE PROCEDURE sp_mamba_dim_concept_answer_insert()
 BEGIN
 -- $BEGIN
 
-INSERT INTO mamba_dim_concept_answer (
-    concept_id,
-    answer_concept,
-    answer_drug
-)
-SELECT
-    ca.concept_id AS concept_id,
-    ca.answer_concept AS answer_concept,
-    ca.answer_drug AS answer_drug
-FROM
-    concept_answer ca;
+INSERT INTO mamba_dim_concept_answer (concept_id,
+                                      answer_concept,
+                                      answer_drug)
+SELECT ca.concept_id     AS concept_id,
+       ca.answer_concept AS answer_concept,
+       ca.answer_drug    AS answer_drug
+FROM concept_answer ca;
 
 -- $END
 END //
@@ -728,10 +775,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_mamba_dim_concept_answer
---
+-- ----------------------  sp_mamba_dim_concept_answer  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -750,10 +796,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_mamba_dim_concept_name_create
---
+-- ----------------------  sp_mamba_dim_concept_name_create  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -763,10 +808,11 @@ CREATE PROCEDURE sp_mamba_dim_concept_name_create()
 BEGIN
 -- $BEGIN
 
-CREATE TABLE mamba_dim_concept_name (
-    concept_name_id int NOT NULL AUTO_INCREMENT,
-    external_concept_id int,
-    concept_name CHAR(255) CHARACTER SET UTF8MB4 NULL,
+CREATE TABLE mamba_dim_concept_name
+(
+    concept_name_id     INT                             NOT NULL AUTO_INCREMENT,
+    external_concept_id INT,
+    concept_name        CHAR(255) CHARACTER SET UTF8MB4 NULL,
     PRIMARY KEY (concept_name_id)
 );
 
@@ -776,10 +822,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_mamba_dim_concept_name_insert
---
+-- ----------------------  sp_mamba_dim_concept_name_insert  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -789,18 +834,13 @@ CREATE PROCEDURE sp_mamba_dim_concept_name_insert()
 BEGIN
 -- $BEGIN
 
-INSERT INTO mamba_dim_concept_name (
-    external_concept_id,
-    concept_name
-)
-SELECT
-    cn.concept_id AS external_concept_id,
-    cn.name AS concept_name
-FROM
-    concept_name cn
-WHERE
-    cn.locale = 'en'
-    AND cn.locale_preferred = 1;
+INSERT INTO mamba_dim_concept_name (external_concept_id,
+                                    concept_name)
+SELECT cn.concept_id AS external_concept_id,
+       cn.name       AS concept_name
+FROM concept_name cn
+WHERE cn.locale = 'en'
+  AND cn.locale_preferred = 1;
 
 -- $END
 END //
@@ -808,10 +848,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_mamba_dim_concept_name
---
+-- ----------------------  sp_mamba_dim_concept_name  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -830,10 +869,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_mamba_dim_encounter_type_create
---
+-- ----------------------  sp_mamba_dim_encounter_type_create  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -843,10 +881,11 @@ CREATE PROCEDURE sp_mamba_dim_encounter_type_create()
 BEGIN
 -- $BEGIN
 
-CREATE TABLE mamba_dim_encounter_type (
-    encounter_type_id int NOT NULL AUTO_INCREMENT,
-    external_encounter_type_id int,
-    encounter_type_uuid CHAR(38) CHARACTER SET UTF8MB4 NOT NULL,
+CREATE TABLE mamba_dim_encounter_type
+(
+    encounter_type_id          INT                            NOT NULL AUTO_INCREMENT,
+    external_encounter_type_id INT,
+    encounter_type_uuid        CHAR(38) CHARACTER SET UTF8MB4 NOT NULL,
     PRIMARY KEY (encounter_type_id)
 );
 
@@ -856,10 +895,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_mamba_dim_encounter_type_insert
---
+-- ----------------------  sp_mamba_dim_encounter_type_insert  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -869,17 +907,12 @@ CREATE PROCEDURE sp_mamba_dim_encounter_type_insert()
 BEGIN
 -- $BEGIN
 
-INSERT INTO mamba_dim_encounter_type (
-     external_encounter_type_id,
-     encounter_type_uuid
-)
-SELECT
-    et.encounter_type_id AS external_encounter_type_id,
-    et.uuid AS encounter_type_uuid
-FROM
-    encounter_type et
-WHERE
-    et.retired = 0;
+INSERT INTO mamba_dim_encounter_type (external_encounter_type_id,
+                                      encounter_type_uuid)
+SELECT et.encounter_type_id AS external_encounter_type_id,
+       et.uuid              AS encounter_type_uuid
+FROM encounter_type et
+WHERE et.retired = 0;
 
 -- $END
 END //
@@ -887,10 +920,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_mamba_dim_encounter_type
---
+-- ----------------------  sp_mamba_dim_encounter_type  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -909,10 +941,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_mamba_dim_encounter_create
---
+-- ----------------------  sp_mamba_dim_encounter_create  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -922,11 +953,12 @@ CREATE PROCEDURE sp_mamba_dim_encounter_create()
 BEGIN
 -- $BEGIN
 
-CREATE TABLE mamba_dim_encounter (
-    encounter_id int NOT NULL AUTO_INCREMENT,
-    external_encounter_id int,
-    external_encounter_type_id int,
-    encounter_type_uuid CHAR(38) CHARACTER SET UTF8MB4 NULL,
+CREATE TABLE mamba_dim_encounter
+(
+    encounter_id               INT                            NOT NULL AUTO_INCREMENT,
+    external_encounter_id      INT,
+    external_encounter_type_id INT,
+    encounter_type_uuid        CHAR(38) CHARACTER SET UTF8MB4 NULL,
     PRIMARY KEY (encounter_id)
 );
 
@@ -936,10 +968,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_mamba_dim_encounter_insert
---
+-- ----------------------  sp_mamba_dim_encounter_insert  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -949,15 +980,11 @@ CREATE PROCEDURE sp_mamba_dim_encounter_insert()
 BEGIN
 -- $BEGIN
 
-INSERT INTO mamba_dim_encounter (
-     external_encounter_id,
-     external_encounter_type_id
-)
-SELECT
-    e.encounter_id AS external_encounter_id,
-    e.encounter_type AS external_encounter_type_id
-FROM
-    encounter e;
+INSERT INTO mamba_dim_encounter (external_encounter_id,
+                                 external_encounter_type_id)
+SELECT e.encounter_id   AS external_encounter_id,
+       e.encounter_type AS external_encounter_type_id
+FROM encounter e;
 
 -- $END
 END //
@@ -965,10 +992,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_mamba_dim_encounter_update
---
+-- ----------------------  sp_mamba_dim_encounter_update  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -980,7 +1006,7 @@ BEGIN
 
 UPDATE mamba_dim_encounter e
     INNER JOIN mamba_dim_encounter_type et
-        ON e.external_encounter_type_id = et.external_encounter_type_id
+    ON e.external_encounter_type_id = et.external_encounter_type_id
 SET e.encounter_type_uuid = et.encounter_type_uuid
 WHERE e.encounter_id > 0;
 
@@ -990,10 +1016,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_mamba_dim_encounter
---
+-- ----------------------  sp_mamba_dim_encounter  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -1013,10 +1038,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_mamba_dim_concept_metadata_create
---
+-- ----------------------  sp_mamba_dim_concept_metadata_create  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -1055,10 +1079,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_mamba_dim_concept_metadata_insert
---
+-- ----------------------  sp_mamba_dim_concept_metadata_insert  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -1088,10 +1111,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_mamba_dim_concept_metadata_update
---
+-- ----------------------  sp_mamba_dim_concept_metadata_update  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -1123,10 +1145,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_mamba_dim_concept_metadata
---
+-- ----------------------  sp_mamba_dim_concept_metadata  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -1146,10 +1167,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_mamba_dim_person_create
---
+-- ----------------------  sp_mamba_dim_person_create  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -1159,11 +1179,12 @@ CREATE PROCEDURE sp_mamba_dim_person_create()
 BEGIN
 -- $BEGIN
 
-CREATE TABLE mamba_dim_person (
-    person_id int NOT NULL AUTO_INCREMENT,
-    external_person_id int,
-    birthdate CHAR(255) CHARACTER SET UTF8MB4 NULL,
-    gender CHAR(255) CHARACTER SET UTF8MB4 NULL,
+CREATE TABLE mamba_dim_person
+(
+    person_id          INT                             NOT NULL AUTO_INCREMENT,
+    external_person_id INT,
+    birthdate          CHAR(255) CHARACTER SET UTF8MB4 NULL,
+    gender             CHAR(255) CHARACTER SET UTF8MB4 NULL,
     PRIMARY KEY (person_id)
 );
 create index mamba_dim_person_external_person_id_index
@@ -1175,10 +1196,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_mamba_dim_person_insert
---
+-- ----------------------  sp_mamba_dim_person_insert  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -1188,17 +1208,13 @@ CREATE PROCEDURE sp_mamba_dim_person_insert()
 BEGIN
 -- $BEGIN
 
-INSERT INTO mamba_dim_person (
-    external_person_id,
-    birthdate,
-    gender
-)
-SELECT
-    psn.person_id AS external_person_id,
-    psn.birthdate AS birthdate,
-    psn.gender AS gender
-FROM
-    person psn;
+INSERT INTO mamba_dim_person (external_person_id,
+                              birthdate,
+                              gender)
+SELECT psn.person_id AS external_person_id,
+       psn.birthdate AS birthdate,
+       psn.gender    AS gender
+FROM person psn;
 
 -- $END
 END //
@@ -1206,10 +1222,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_mamba_dim_person
---
+-- ----------------------  sp_mamba_dim_person  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -1228,10 +1243,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_mamba_dim_person_name_create
---
+-- ----------------------  sp_mamba_dim_person_name_create  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -1241,25 +1255,25 @@ CREATE PROCEDURE sp_mamba_dim_person_name_create()
 BEGIN
 -- $BEGIN
 
-CREATE TABLE mamba_dim_person_name (
-    person_name_id int NOT NULL AUTO_INCREMENT,
-    external_person_name_id int,
-    external_person_id int,
-    given_name CHAR(255) CHARACTER SET UTF8MB4 NULL,
+CREATE TABLE mamba_dim_person_name
+(
+    person_name_id          INT                             NOT NULL AUTO_INCREMENT,
+    external_person_name_id INT,
+    external_person_id      INT,
+    given_name              CHAR(255) CHARACTER SET UTF8MB4 NULL,
     PRIMARY KEY (person_name_id)
 );
-create index mamba_dim_person_name_external_person_id_index
-    on mamba_dim_person_name (external_person_id);
+CREATE INDEX mamba_dim_person_name_external_person_id_index
+    ON mamba_dim_person_name (external_person_id);
 -- $END
 END //
 
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_mamba_dim_person_name_insert
---
+-- ----------------------  sp_mamba_dim_person_name_insert  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -1269,17 +1283,13 @@ CREATE PROCEDURE sp_mamba_dim_person_name_insert()
 BEGIN
 -- $BEGIN
 
-INSERT INTO mamba_dim_person_name (
-    external_person_name_id,
-    external_person_id,
-    given_name
-)
-SELECT
-    pn.person_name_id AS external_person_name_id,
-    pn.person_id AS external_person_id,
-    pn.given_name AS given_name
-FROM
-    person_name pn;
+INSERT INTO mamba_dim_person_name (external_person_name_id,
+                                   external_person_id,
+                                   given_name)
+SELECT pn.person_name_id AS external_person_name_id,
+       pn.person_id      AS external_person_id,
+       pn.given_name     AS given_name
+FROM person_name pn;
 
 -- $END
 END //
@@ -1287,10 +1297,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_mamba_dim_person_name
---
+-- ----------------------  sp_mamba_dim_person_name  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -1309,10 +1318,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_mamba_dim_person_address_create
---
+-- ----------------------  sp_mamba_dim_person_address_create  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -1322,14 +1330,15 @@ CREATE PROCEDURE sp_mamba_dim_person_address_create()
 BEGIN
 -- $BEGIN
 
-CREATE TABLE mamba_dim_person_address (
-    person_address_id int NOT NULL AUTO_INCREMENT,
-    external_person_address_id int,
-    external_person_id int,
-    city_village CHAR(255) CHARACTER SET UTF8MB4 NULL,
-    county_district CHAR(255) CHARACTER SET UTF8MB4 NULL,
-    address1 CHAR(255) CHARACTER SET UTF8MB4 NULL,
-    address2 CHAR(255) CHARACTER SET UTF8MB4 NULL,
+CREATE TABLE mamba_dim_person_address
+(
+    person_address_id          INT                             NOT NULL AUTO_INCREMENT,
+    external_person_address_id INT,
+    external_person_id         INT,
+    city_village               CHAR(255) CHARACTER SET UTF8MB4 NULL,
+    county_district            CHAR(255) CHARACTER SET UTF8MB4 NULL,
+    address1                   CHAR(255) CHARACTER SET UTF8MB4 NULL,
+    address2                   CHAR(255) CHARACTER SET UTF8MB4 NULL,
     PRIMARY KEY (person_address_id)
 );
 create index mamba_dim_person_address_external_person_id_index
@@ -1341,10 +1350,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_mamba_dim_person_address_insert
---
+-- ----------------------  sp_mamba_dim_person_address_insert  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -1354,23 +1362,19 @@ CREATE PROCEDURE sp_mamba_dim_person_address_insert()
 BEGIN
 -- $BEGIN
 
-INSERT INTO mamba_dim_person_address (
-    external_person_address_id,
-    external_person_id,
-    city_village,
-    county_district,
-    address1,
-    address2
-)
-SELECT
-    pa.person_address_id AS external_person_address_id,
-    pa.person_id AS external_person_id,
-    pa.city_village AS city_village,
-    pa.county_district AS county_district,
-    pa.address1 AS address1,
-    pa.address2 AS address2
-FROM
-    person_address pa;
+INSERT INTO mamba_dim_person_address (external_person_address_id,
+                                      external_person_id,
+                                      city_village,
+                                      county_district,
+                                      address1,
+                                      address2)
+SELECT pa.person_address_id AS external_person_address_id,
+       pa.person_id         AS external_person_id,
+       pa.city_village      AS city_village,
+       pa.county_district   AS county_district,
+       pa.address1          AS address1,
+       pa.address2          AS address2
+FROM person_address pa;
 
 -- $END
 END //
@@ -1378,10 +1382,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_mamba_dim_person_address
---
+-- ----------------------  sp_mamba_dim_person_address  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -1400,10 +1403,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_dim_client_create
---
+-- ----------------------  sp_dim_client_create  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -1412,15 +1414,16 @@ DROP PROCEDURE IF EXISTS sp_dim_client_create;
 CREATE PROCEDURE sp_dim_client_create()
 BEGIN
 -- $BEGIN
-CREATE TABLE dim_client (
-    id INT NOT NULL AUTO_INCREMENT,
-    client_id INT,
-    date_of_birth DATE NULL,
-    age INT,
-    sex CHAR(255) CHARACTER SET UTF8MB4 NULL,
-    county CHAR(255) CHARACTER SET UTF8MB4 NULL,
-    sub_county CHAR(255) CHARACTER SET UTF8MB4 NULL,
-    ward CHAR(255) CHARACTER SET UTF8MB4 NULL,
+CREATE TABLE dim_client
+(
+    id            INT                             NOT NULL AUTO_INCREMENT,
+    client_id     INT,
+    date_of_birth DATE                            NULL,
+    age           INT,
+    sex           CHAR(255) CHARACTER SET UTF8MB4 NULL,
+    county        CHAR(255) CHARACTER SET UTF8MB4 NULL,
+    sub_county    CHAR(255) CHARACTER SET UTF8MB4 NULL,
+    ward          CHAR(255) CHARACTER SET UTF8MB4 NULL,
     PRIMARY KEY (id)
 );
 -- $END
@@ -1429,10 +1432,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_dim_client_insert
---
+-- ----------------------  sp_dim_client_insert  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -1442,30 +1444,27 @@ CREATE PROCEDURE sp_dim_client_insert()
 BEGIN
 -- $BEGIN
 
-INSERT INTO dim_client (
-    client_id ,
-    date_of_birth,
-    age,
-    sex,
-    county,
-    sub_county,
-    ward
-)
-SELECT
-       `psn`.`person_id`                                                                                              AS `client_id`,
-       `psn`.`birthdate`                                                                                              AS `date_of_birth`,
-       timestampdiff(YEAR, `psn`.`birthdate`, now())                                                                  AS `age`,
+INSERT INTO dim_client (client_id,
+                        date_of_birth,
+                        age,
+                        sex,
+                        county,
+                        sub_county,
+                        ward)
+SELECT `psn`.`person_id`                             AS `client_id`,
+       `psn`.`birthdate`                             AS `date_of_birth`,
+       timestampdiff(YEAR, `psn`.`birthdate`, now()) AS `age`,
        (CASE `psn`.`gender`
             WHEN 'M' THEN 'Male'
             WHEN 'F' THEN 'Female'
             ELSE '_'
-        END)                                                                                                          AS `sex`,
-       `pa`.`county_district`                                                                                         AS `county`,
-       `pa`.`city_village`                                                                                            AS `sub_county`,
-       `pa`.`address1`                                                                                                AS `ward`
-from ((`mamba_dim_person` `psn`
-left join `mamba_dim_person_name` `pn` on ((`psn`.`external_person_id` = `pn`.`external_person_id`)))
-left join `mamba_dim_person_address` `pa` on ((`psn`.`external_person_id` = `pa`.`external_person_id`)));
+           END)                                      AS `sex`,
+       `pa`.`county_district`                        AS `county`,
+       `pa`.`city_village`                           AS `sub_county`,
+       `pa`.`address1`                               AS `ward`
+FROM ((`mamba_dim_person` `psn`
+    LEFT JOIN `mamba_dim_person_name` `pn` on ((`psn`.`external_person_id` = `pn`.`external_person_id`)))
+    LEFT JOIN `mamba_dim_person_address` `pa` on ((`psn`.`external_person_id` = `pa`.`external_person_id`)));
 
 
 -- $END
@@ -1474,10 +1473,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_dim_client_update
---
+-- ----------------------  sp_dim_client_update  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -1487,18 +1485,15 @@ CREATE PROCEDURE sp_dim_client_update()
 BEGIN
 -- $BEGIN
 
-
-
 -- $END
 END //
 
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_dim_client
---
+-- ----------------------  sp_dim_client  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -1518,10 +1513,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_mamba_z_encounter_obs
---
+-- ----------------------  sp_mamba_z_encounter_obs  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -1602,10 +1596,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_mamba_z_tables
---
+-- ----------------------  sp_mamba_z_tables  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -1623,10 +1616,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_data_processing_flatten
---
+-- ----------------------  sp_data_processing_flatten  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -1635,7 +1627,8 @@ DROP PROCEDURE IF EXISTS sp_data_processing_flatten;
 CREATE PROCEDURE sp_data_processing_flatten()
 BEGIN
 -- $BEGIN
-CALL sp_xf_system_drop_all_tables_in_schema('openmrs_dev');
+-- CALL sp_xf_system_drop_all_tables_in_schema($target_database);
+CALL sp_xf_system_drop_all_tables_in_schema();
 
 CALL sp_mamba_dim_concept_datatype;
 
@@ -1670,10 +1663,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_data_processing_derived_covid
---
+-- ----------------------  sp_data_processing_derived_covid  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -1690,10 +1682,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_data_processing_derived_hts
---
+-- ----------------------  sp_data_processing_derived_hts  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -1712,10 +1703,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_data_processing_etl
---
+-- ----------------------  sp_data_processing_etl  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -1737,10 +1727,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_dim_client_covid_create
---
+-- ----------------------  sp_dim_client_covid_create  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -1767,10 +1756,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_dim_client_covid_insert
---
+-- ----------------------  sp_dim_client_covid_insert  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -1802,10 +1790,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_dim_client_covid_update
---
+-- ----------------------  sp_dim_client_covid_update  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -1820,10 +1807,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_dim_client_covid
---
+-- ----------------------  sp_dim_client_covid  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -1841,10 +1827,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_fact_encounter_covid_create
---
+-- ----------------------  sp_fact_encounter_covid_create  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -1927,10 +1912,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_fact_encounter_covid_insert
---
+-- ----------------------  sp_fact_encounter_covid_insert  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -2079,10 +2063,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_fact_encounter_covid_update
---
+-- ----------------------  sp_fact_encounter_covid_update  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -2097,10 +2080,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_fact_encounter_covid
---
+-- ----------------------  sp_fact_encounter_covid  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -2118,10 +2100,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_data_processing_derived_covid
---
+-- ----------------------  sp_data_processing_derived_covid  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -2138,10 +2119,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_dim_client_hiv_hts_create
---
+-- ----------------------  sp_dim_client_hiv_hts_create  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -2168,10 +2148,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_dim_client_hiv_hts_insert
---
+-- ----------------------  sp_dim_client_hiv_hts_insert  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -2203,10 +2182,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_dim_client_hiv_hts_update
---
+-- ----------------------  sp_dim_client_hiv_hts_update  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -2221,10 +2199,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_dim_client_hiv_hts
---
+-- ----------------------  sp_dim_client_hiv_hts  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -2242,10 +2219,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_fact_encounter_hiv_hts_create
---
+-- ----------------------  sp_fact_encounter_hiv_hts_create  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -2302,10 +2278,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_fact_encounter_hiv_hts_insert
---
+-- ----------------------  sp_fact_encounter_hiv_hts_insert  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -2435,10 +2410,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_fact_encounter_hiv_hts_update
---
+-- ----------------------  sp_fact_encounter_hiv_hts_update  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -2453,10 +2427,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_fact_encounter_hiv_hts
---
+-- ----------------------  sp_fact_encounter_hiv_hts  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -2474,10 +2447,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_fact_tx_curr_create
---
+-- ----------------------  sp_fact_tx_curr_create  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -2513,10 +2485,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_fact_tx_curr_insert
---
+-- ----------------------  sp_fact_tx_curr_insert  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -2548,10 +2519,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_fact_tx_curr_update
---
+-- ----------------------  sp_fact_tx_curr_update  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -2566,10 +2536,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_fact_tx_curr
---
+-- ----------------------  sp_fact_tx_curr  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -2587,10 +2556,9 @@ END //
 DELIMITER ;
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_fact_tx_curr_query
---
+-- ----------------------  sp_fact_tx_curr_query  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
@@ -2611,10 +2579,9 @@ DELIMITER ;
 
 
         
-
 -- ---------------------------------------------------------------------------------------------
--- sp_data_processing_derived_hts
---
+-- ----------------------  sp_data_processing_derived_hts  ----------------------------
+-- ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
