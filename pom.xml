@@ -16,12 +16,12 @@
 
 	<name>ETHIOHRI Reports</name>
 	<description>OpenMRS module for Packaging OHRI Reports powered by the Reporting Module</description>
-	<url>https://github.com/UCSF-IGHS/openmrs-module-ohri-reports</url>
+	<url>https://github.com/CDC-HIS/openmrs-module-ethiohrireports</url>
 
 	<scm>
-		<connection>scm:git:git@github.com:UCSF-IGHS/openmrs-module-ohri-reports.git</connection>
-		<developerConnection>scm:git:git@github.com:CDC-HIS/EthiohriReporting-module.git</developerConnection>
-		<url>https://github.com/CDC-HIS/EthiohriReporting-module</url>
+		<connection>scm:git:git@github.com:UCSF-IGHS/openmrs-module-ethiohrireports.git</connection>
+		<developerConnection>scm:git:git@github.com:CDC-HIS/openmrs-module-ethiohrireports.git</developerConnection>
+		<url>https://github.com/CDC-HIS/openmrs-module-ethiohrireports</url>
 	</scm>
 
 	<modules>

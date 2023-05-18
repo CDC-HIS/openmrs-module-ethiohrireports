@@ -17,17 +17,17 @@
                         http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
                         http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
 
-    <context:component-scan base-package="org.openmrs.module.ohrireports" />
+    <context:component-scan base-package="org.openmrs.module.ethiohrireports" />
 
     <!-- Wraps OHRIReportsService methods in DB transactions and OpenMRS interceptors,
     which set audit info like dateCreated, changedBy, etc.-->
     <bean id="flattenDatabaseDao"
-        class="org.openmrs.module.ohrireports.api.impl.HibernateFlattenDatabaseDao">
+        class="org.openmrs.module.ethiohrireports.api.impl.HibernateFlattenDatabaseDao">
         <property name="sessionFactory" ref="dbSessionFactory" />
     </bean>
 
     <!-- <bean id="txCurrDataSetDefinitionEvaluator"
-        class="org.openmrs.module.ohrireports.reports.datasetevaluator.TXCurrDataSetDefinitionEvaluator">
+        class="org.openmrs.module.ethiohrireports.reports.datasetevaluator.TXCurrDataSetDefinitionEvaluator">
         <property name="sessionFactory" ref="dbSessionFactory" />
     </bean> -->
 
@@ -37,7 +37,7 @@
             <ref bean="transactionManager" />
         </property>
         <property name="target">
-            <bean class="org.openmrs.module.ohrireports.api.impl.OHRIReportsServiceImpl">
+            <bean class="org.openmrs.module.ethiohrireports.api.impl.OHRIReportsServiceImpl">
                 <property name="dao" ref="ohrireports.OHRIReportsDao" />
             </bean>
         </property>
@@ -52,7 +52,7 @@
         class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager" ref="transactionManager" />
         <property name="target">
-            <bean class="org.openmrs.module.ohrireports.api.impl.FlattenDatabaseServiceImpl">
+            <bean class="org.openmrs.module.ethiohrireports.api.impl.FlattenDatabaseServiceImpl">
                 <property name="dao" ref="flattenDatabaseDao" />
             </bean>
         </property>
@@ -63,7 +63,7 @@
     <bean parent="serviceContext">
         <property name="moduleService">
             <list>
-                <value>org.openmrs.module.ohrireports.api.FlattenDatabaseService</value>
+                <value>org.openmrs.module.ethiohrireports.api.FlattenDatabaseService</value>
                 <ref bean="flattenDatabaseService" />
             </list>
         </property>
@@ -73,7 +73,7 @@
     <bean parent="serviceContext">
         <property name="moduleService">
             <list>
-                <value>org.openmrs.module.ohrireports.api.OHRIReportsService</value>
+                <value>org.openmrs.module.ethiohrireports.api.OHRIReportsService</value>
                 <ref bean="ohrireports.OHRIReportsService" />
             </list>
         </property>
