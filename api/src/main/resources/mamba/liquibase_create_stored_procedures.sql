@@ -1641,6 +1641,7 @@ BEGIN
 -- CALL sp_dim_client_hiv_hts;
 -- CALL sp_fact_encounter_hiv_hts;
 
+CALL sp_dim_follow_up_client;
 CALL sp_fact_tx_curr;
 -- $END
 END~
@@ -2150,6 +2151,130 @@ END~
 
         
 -- ---------------------------------------------------------------------------------------------
+-- ----------------------  sp_dim_follow_up_client_create  ----------------------------
+-- ---------------------------------------------------------------------------------------------
+
+
+DROP PROCEDURE IF EXISTS sp_dim_follow_up_client_create;
+
+~
+CREATE PROCEDURE sp_dim_follow_up_client_create()
+BEGIN
+-- $BEGIN
+CREATE TABLE IF NOT EXISTS mamba_dim_follow_up_client
+(
+    id            INT AUTO_INCREMENT,
+    client_id     INT           NULL,
+    identifier    NVARCHAR(255) NULL,
+    date_of_birth DATE          NULL,
+    age_num     INT           NULL,
+    sex           NVARCHAR(50)  NULL,
+    county        NVARCHAR(255) NULL,
+    sub_county    NVARCHAR(255) NULL,
+    ward          NVARCHAR(255) NULL,
+    given_name       NVARCHAR(255) NULL,
+    middle_name   NVARCHAR(255) NULL,
+    family_name  NVARCHAR(255) NULL,
+    PRIMARY KEY (id)
+);
+
+CREATE INDEX
+   mamba_dim_follow_up_client_client_id_index ON mamba_dim_follow_up_client (client_id);
+
+-- $END
+END~
+
+
+        
+-- ---------------------------------------------------------------------------------------------
+-- ----------------------  sp_dim_follow_up_client_insert  ----------------------------
+-- ---------------------------------------------------------------------------------------------
+
+
+DROP PROCEDURE IF EXISTS sp_dim_follow_up_client_insert;
+
+~
+CREATE PROCEDURE sp_dim_follow_up_client_insert()
+BEGIN
+-- $BEGIN
+
+INSERT INTO
+    mamba_dim_follow_up_client (
+        client_id,
+        identifier,
+        date_of_birth,
+        age_num,
+        sex,
+        county,
+        sub_county,
+        ward,
+        given_name,
+        middle_name,
+        family_name
+    )
+SELECT
+ DISTINCT (f.client_id),
+    pi.identifier,
+    p.birthdate,
+    DATE_FORMAT(
+        FROM_DAYS(DATEDIFF(NOW(), p.birthdate)),
+        '%Y'
+    ) + 0 AS age,
+    p.gender,
+    pa.country,
+    pa.city_village as sub_country,
+    pa.address1 as worda,
+    pn.given_name,
+    pn.middle_name,
+    pn.family_name
+from
+    mamba_flat_encounter_follow_up as f
+    INNER JOIN person as p on p.person_id = f.client_id
+    INNER JOIN person_name as pn on pn.person_id = f.client_id
+    INNER JOIN patient_identifier as pi on pi.patient_id = f.client_id AND pi.identifier_type =3
+    LEFT JOIN person_address as pa on pa.person_id = f.client_id;
+
+-- $END
+END~
+
+
+        
+-- ---------------------------------------------------------------------------------------------
+-- ----------------------  sp_dim_follow_up_client_update  ----------------------------
+-- ---------------------------------------------------------------------------------------------
+
+
+DROP PROCEDURE IF EXISTS sp_dim_follow_up_client_update;
+
+~
+CREATE PROCEDURE sp_dim_follow_up_client_update()
+BEGIN
+-- $BEGIN
+-- $END
+END~
+
+
+        
+-- ---------------------------------------------------------------------------------------------
+-- ----------------------  sp_dim_follow_up_client  ----------------------------
+-- ---------------------------------------------------------------------------------------------
+
+
+DROP PROCEDURE IF EXISTS sp_dim_follow_up_client;
+
+~
+CREATE PROCEDURE sp_dim_follow_up_client()
+BEGIN
+-- $BEGIN
+CALL sp_dim_follow_up_client_create();
+CALL sp_dim_follow_up_client_insert();
+CALL sp_dim_follow_up_client_update();
+-- $END
+END~
+
+
+        
+-- ---------------------------------------------------------------------------------------------
 -- ----------------------  sp_fact_encounter_hiv_hts_create  ----------------------------
 -- ---------------------------------------------------------------------------------------------
 
@@ -2486,16 +2611,32 @@ END~
 DROP PROCEDURE IF EXISTS sp_fact_tx_curr_query;
 
 ~
-CREATE PROCEDURE sp_fact_tx_curr_query(
-    IN art_end_date DATETIME
-) 
-
-BEGIN 
-
-	SELECT txc.patient_status, txc.regiment, txc.treatment_end_date 
-    FROM mamba_fact_tx_curr txc
-	    WHERE txc.treatment_end_date >= art_end_date;
+CREATE PROCEDURE sp_fact_tx_curr_query(IN ART_END_DATE 
+DATETIME) BEGIN 
+	SELECT
+	    mp.identifier,
+	    CONCAT(
+	        mp.given_name,
+	        " ",
+	        mp.middle_name,
+	        " ",
+	        mp.family_name
+	    ) as full_name,
+	    case
+	        WHEN mp.sex = 'M' THEN "Male"
+	        ELSE "Female"
+	    END as gender,
+	      mp.age_num as `age`,
+	    txc.treatment_end_date,
+	    txc.patient_status,
+	    txc.regiment
+	FROM mamba_fact_tx_curr txc
+	    INNER JOIN mamba_dim_follow_up_client as mp
+		on txc.client_id = mp.client_id
+	WHERE
+	    txc.treatment_end_date >= art_end_date;
 END~
+
 
 
 
@@ -2514,6 +2655,7 @@ BEGIN
 -- CALL sp_dim_client_hiv_hts;
 -- CALL sp_fact_encounter_hiv_hts;
 
+CALL sp_dim_follow_up_client;
 CALL sp_fact_tx_curr;
 -- $END
 END~

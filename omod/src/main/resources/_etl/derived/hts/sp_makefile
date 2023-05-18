@@ -6,6 +6,11 @@ dimensions/dim_client_hiv_hts/sp_dim_client_hiv_hts_insert.sql
 dimensions/dim_client_hiv_hts/sp_dim_client_hiv_hts_update.sql
 dimensions/dim_client_hiv_hts/sp_dim_client_hiv_hts.sql
 
+dimensions/dim_follow_up_client/sp_dim_follow_up_client_create.sql
+dimensions/dim_follow_up_client/sp_dim_follow_up_client_insert.sql
+dimensions/dim_follow_up_client/sp_dim_follow_up_client_update.sql
+dimensions/dim_follow_up_client/sp_dim_follow_up_client.sql
+
 #############################################################################
 ##################### HTS/HIV Fact Encounter Table SPs  #####################
 #############################################################################

@@ -68,34 +68,36 @@ public class TXCurrDataSetDefinitionEvaluator implements DataSetEvaluator {
 		context = evalContext;
 		SimpleDataSet data = new SimpleDataSet(dataSetDefinition, evalContext);
 
-		List<Obs> obsList = getTxCurrPatients();
 
 		DataSetRow row = null;
-		PatientIdentifierType mrnIdentifierType = patientService
-				.getPatientIdentifierTypeByUuid(MRN_PATIENT_IDENTIFIERS);
-		PatientIdentifierType openmrsIdentifierType = patientService
-				.getPatientIdentifierTypeByUuid(OPENMRS_PATIENT_IDENTIFIERS);
+
 
 		List<Object[]> resultSet = getEtlCurr();
 
 		for (Object[] objects : resultSet) {
 
-			// EthiopianDate ethiopianDate = null;
+			 //EthiopianDate ethiopianDate = null;
 			try {
 				// ethiopianDate = EthiopianDateConverter
-				// .ToEthiopianDate(DateTime.parse(objects[2]
+				 //.ToEthiopianDate(DateTime.parse(objects[2]
 				// .toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
 
 				row = new DataSetRow();
-				row.addColumnValue(new DataSetColumn("Status", "Status",
+				row.addColumnValue(new DataSetColumn("identifier", "OpenmrsID",
 						String.class),
 						Objects.isNull(objects[0]) || Objects.isNull(objects[0]) ? "" : objects[0].toString());
 
-				row.addColumnValue(new DataSetColumn("Regimen", "Regmin", String.class),
-						objects[1]);
+				row.addColumnValue(new DataSetColumn("full_name", "FullName",
+						String.class),
+						Objects.isNull(objects[1]) || Objects.isNull(objects[1]) ? "" : objects[1].toString());
 
-				row.addColumnValue(new DataSetColumn("TreatmentEndDate", "Treatment End Date",
-						Date.class), objects[2]);
+				row.addColumnValue(new DataSetColumn("gender", "Gender", String.class),
+						objects[2]);
+
+				row.addColumnValue(new DataSetColumn("age", "Age",
+						Date.class), objects[3]);
+				row.addColumnValue(new DataSetColumn("treatment_end_date", "Treatment End Date",
+						Date.class), objects[4]);
 				// row.addColumnValue(new DataSetColumn("TreatmentEndDateETC", "Treatment End
 				// Date ETH",
 				// String.class),
@@ -103,6 +105,10 @@ public class TXCurrDataSetDefinitionEvaluator implements DataSetEvaluator {
 				// : ethiopianDate.getDay() + "/" + ethiopianDate.getMonth() + "/"
 				// + ethiopianDate.getYear());
 
+				row.addColumnValue(new DataSetColumn("patient_status", "Status",
+				Date.class), objects[5]);
+				row.addColumnValue(new DataSetColumn("regiment", "Regiment",
+				Date.class), objects[6]);
 				data.addRow(row);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
@@ -113,10 +119,6 @@ public class TXCurrDataSetDefinitionEvaluator implements DataSetEvaluator {
 		return data;
 	}
 
-	private String getStringIdentifier(PatientIdentifier patientIdentifier) {
-		return Objects.isNull(patientIdentifier) ? "--" : patientIdentifier.getIdentifier();
-	}
-
 	public DbSessionFactory getSessionFactory() {
 		return sessionFactory;
 	}
@@ -125,94 +127,21 @@ public class TXCurrDataSetDefinitionEvaluator implements DataSetEvaluator {
 		this.sessionFactory = sessionFactory;
 	}
 
-	private List<Obs> getTxCurrPatients() {
-
-		List<Integer> patientsId = getListOfALiveORRestartPatients();
-
-		List<Person> patients = new ArrayList<>();
-		List<Obs> obseList = new ArrayList<>();
-
-		if (patientsId == null || patientsId.size() == 0)
-			return obseList;
-		HqlQueryBuilder queryBuilder = new HqlQueryBuilder();
-		queryBuilder.select("obv");
-		queryBuilder.from(Obs.class, "obv")
-				.whereEqual("obv.encounter.encounterType", hdsd.getEncounterType())
-				.and()
-				.whereEqual("obv.concept", conceptService.getConceptByUuid(TREATMENT_END_DATE))
-				.and()
-				.whereGreaterOrEqualTo("obv.valueDatetime", hdsd.getEndDate())
-				.and()
-				.whereLess("obv.obsDatetime", hdsd.getEndDate())
-				.whereIdIn("obv.personId", patientsId)
-				.orderDesc("obv.personId,obv.obsDatetime");
-		System.out.println(queryBuilder.toString());
-		List<Obs> evaluateToList = evaluationService.evaluateToList(queryBuilder, Obs.class, context);
-		for (Obs obs : evaluateToList) {
-			if (!patients.contains(obs.getPerson())) {
-				patients.add(obs.getPerson());
-				obseList.add(obs);
-			}
-		}
-		return obseList;
-	}
-
 	private List<Object[]> getEtlCurr() {
 		SQLQuery txCurrQuery = sessionFactory.getCurrentSession()
 				.createSQLQuery("CALL sp_fact_tx_curr_query(:art_end_date)");
 
 		txCurrQuery.setParameter("art_end_date", hdsd.getEndDate());
+		txCurrQuery.addScalar("identifier", StandardBasicTypes.STRING);
+		txCurrQuery.addScalar("full_name", StandardBasicTypes.STRING);
+		txCurrQuery.addScalar("gender", StandardBasicTypes.STRING);
+		txCurrQuery.addScalar("age", StandardBasicTypes.INTEGER);
+		txCurrQuery.addScalar("treatment_end_date", StandardBasicTypes.DATE);
 		txCurrQuery.addScalar("patient_status", StandardBasicTypes.STRING);
 		txCurrQuery.addScalar("regiment", StandardBasicTypes.STRING);
-		txCurrQuery.addScalar("treatment_end_date", StandardBasicTypes.DATE);
 
 		List<Object[]> txCurrResult = txCurrQuery.list();
 		return txCurrResult;
 	}
 
-	private List<Integer> getListOfALiveORRestartPatients() {
-
-		List<Concept> concepts = Arrays.asList(conceptService.getConceptByUuid(ALIVE),
-				conceptService.getConceptByUuid(RESTART));
-
-		HqlQueryBuilder queryBuilder = new HqlQueryBuilder();
-
-		queryBuilder.select(" obv")
-
-				.from(Obs.class, "obv")
-				.whereEqual("obv.encounter.encounterType", hdsd.getEncounterType())
-				.and()
-				.whereEqual("obv.concept", conceptService.getConceptByUuid(PATIENT_STATUS))
-				.and()
-				.whereIn("obv.valueCoded", concepts);
-
-		Set<Integer> patients = new LinkedHashSet<>();
-		List<Obs> obsList = evaluationService.evaluateToList(queryBuilder, Obs.class, context);
-		// Removing duplicate using HashSet
-		for (Obs obs : obsList) {
-			if (patients.add(obs.getPersonId())) {
-				// updating
-				patientStatus.put(obs.getPersonId(), obs.getValueCoded());
-			}
-		}
-
-		return new ArrayList<Integer>(patients);
-	}
-
-	private String getRegimen(Obs obs, EvaluationContext context) {
-		HqlQueryBuilder queryBuilder = new HqlQueryBuilder();
-
-		queryBuilder.select("obv.valueCoded").from(Obs.class, "obv")
-				.whereInAny("obv.concept", conceptService.getConceptByUuid(REGIMEN))
-				.whereEqual("obv.encounter", obs.getEncounter())
-				.and().whereEqual("obv.person", obs.getPerson())
-				.orderDesc("obv.obsDatetime").limit(1);
-		List<Concept> concepts = evaluationService.evaluateToList(queryBuilder, Concept.class, context);
-
-		Concept data = null;
-		if (concepts != null && concepts.size() > 0)
-			data = concepts.get(0);
-
-		return data == null ? "--" : data.getName().getName();
-	}
 }
